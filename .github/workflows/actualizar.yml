@@ -1,0 +1,66 @@
+name: Actualizar panel de licitaciones
+
+on:
+  schedule:
+    # Dos veces al día (hora UTC): ~07:30 y ~13:30 en Chile en horario de verano.
+    - cron: "30 10 * * *"
+    - cron: "30 16 * * *"
+  workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write      # guardar data/cache.json y docs/data.json
+  pages: write         # publicar la página
+  id-token: write
+
+concurrency:
+  group: actualizar-panel
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Consultar Mercado Público y generar los datos
+        env:
+          MERCADO_PUBLICO_TICKET: ${{ secrets.MERCADO_PUBLICO_TICKET }}
+        run: python actualizar_licitaciones.py
+
+      - name: Guardar los datos en el repositorio
+        run: |
+          git config user.name "panel-licitaciones"
+          git config user.email "panel-licitaciones@users.noreply.github.com"
+          git add data/cache.json docs/data.json
+          if git diff --cached --quiet; then
+            echo "Sin cambios que guardar."
+          else
+            git commit -m "Actualización de datos $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git push
+          fi
+
+      - name: Configurar la publicación
+        uses: actions/configure-pages@v5
+
+      - name: Preparar la página
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Publicar la página
+        id: deployment
+        uses: actions/deploy-pages@v4
