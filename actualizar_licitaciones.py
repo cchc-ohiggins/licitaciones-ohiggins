@@ -51,6 +51,9 @@ TICKET = os.environ.get("MERCADO_PUBLICO_TICKET", "").strip()
 PAUSA_SEG = float(os.environ.get("MP_PAUSA_SEG", "0.4"))
 # Tope de consultas de detalle por ejecución (protege el cupo diario de la API).
 MAX_DETALLES = int(os.environ.get("MP_MAX_DETALLES", "6000"))
+# Tiempo máximo (minutos) dedicado a consultar detalles. GitHub corta el proceso a los 240 min
+# sin guardar nada, así que se corta antes, se guarda lo avanzado y se continúa en la próxima ejecución.
+MAX_MINUTOS = float(os.environ.get("MP_MAX_MINUTOS", "190"))
 # Cada cuántos días se vuelve a consultar el detalle de las licitaciones de la región
 # (para captar cambios de descripción o monto).
 REFRESCO_DIAS = int(os.environ.get("MP_REFRESCO_DIAS", "7"))
@@ -380,9 +383,13 @@ def main() -> int:
 
     consultadas = fallidas = seguidas = 0
     parcial, motivo = False, ""
+    inicio_detalles = time.monotonic()
     for cod in pendientes:
         if consultadas >= MAX_DETALLES:
             parcial, motivo = True, "se alcanzó el tope de consultas de esta ejecución"
+            break
+        if (time.monotonic() - inicio_detalles) / 60 >= MAX_MINUTOS:
+            parcial, motivo = True, f"se alcanzó el tiempo máximo de la ejecución ({MAX_MINUTOS:g} min); el resto sigue en la próxima"
             break
         try:
             resp = consultar({"codigo": cod})
