@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Licitaciones activas · Región de O'Higgins | CChC</title>
+<link rel="icon" href="data:,">
+<meta name="description" content="Panel de licitaciones activas de Mercado Público en la Región de O'Higgins: mapa por comuna, montos, plazos de cierre, organismo comprador y link directo a la ficha. Cámara Chilena de la Construcción, Sede O'Higgins.">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<style>
+:root{
+  --naranja:#E74100; --azul:#006EDC; --azul-osc:#003D6B; --gris:#D9D9D9;
+  --naranja-t:#FFE6DA; --naranja-txt:#8F2700; --azul-t:#E3EFFC; --gris-t:#F1F2F4; --neutro:#7A8896;
+  --fondo:#F5F7FA; --tarjeta:#FFFFFF; --texto:#14283C; --texto-2:#4B5B6B; --borde:#D9D9D9;
+  --radio:10px;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--fondo);color:var(--texto);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.45}
+a{color:var(--azul)}
+.cab{background:var(--azul-osc);color:#fff;border-bottom:4px solid var(--naranja)}
+.cab-in{max-width:1280px;margin:0 auto;padding:22px 20px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.cab h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.cab .sub{margin:4px 0 0;font-size:14px;color:#C9DCF0}
+.cab .meta{text-align:right;font-size:13px;color:#C9DCF0}
+.cab .meta strong{color:#fff;font-size:15px;display:block}
+main{max-width:1280px;margin:0 auto;padding:20px}
+.aviso{border-radius:var(--radio);padding:12px 16px;margin-bottom:14px;font-size:14px;border:1px solid}
+.aviso.demo{background:var(--naranja-t);border-color:var(--naranja);color:var(--naranja-txt);font-weight:600}
+.aviso.info{background:var(--azul-t);border-color:var(--azul);color:var(--azul-osc)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:14px 16px;border-top:4px solid var(--azul);min-width:0}
+.kpi.alerta{border-top-color:var(--naranja)}
+.kpi .et{font-size:12px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.kpi .val{font-size:23px;font-weight:700;color:var(--azul-osc);line-height:1.2;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi.alerta .val{color:var(--naranja-txt)}
+.kpi .det{font-size:12.5px;color:var(--texto-2);margin-top:2px;overflow-wrap:anywhere}
+.panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:16px;margin-bottom:16px}
+.panel h2{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--azul-osc)}
+.panel .nota{margin:0 0 10px;font-size:12.5px;color:var(--texto-2)}
+.filtros{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+.filtros .busca{grid-column:span 2}
+.filtros label{display:block;font-size:12.5px;font-weight:600;color:var(--texto-2);margin-bottom:4px}
+.filtros input[type=search],.filtros select{width:100%;padding:9px 10px;border:1px solid #B7BEC6;border-radius:8px;font:inherit;color:var(--texto);background:#fff;min-height:40px}
+.filtros input:focus,.filtros select:focus,.btn:focus-visible,th button:focus-visible,.bar:focus-visible,.pag button:focus-visible{outline:3px solid var(--azul);outline-offset:1px}
+.fila2{display:flex;gap:18px;align-items:center;flex-wrap:wrap;grid-column:1/-1}
+.filtros label.chk{display:flex;margin:0}
+.chk{gap:8px;align-items:center;font-size:14px;font-weight:600;color:var(--azul-osc);cursor:pointer}
+.chk input{width:18px;height:18px;margin:0;accent-color:var(--azul)}
+.fila2 .esp{flex:1}
+.btn{display:inline-block;padding:8px 14px;border-radius:8px;border:1px solid var(--azul);background:#fff;color:var(--azul);font:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--azul-t)}
+.btn.pri{background:var(--azul);color:#fff}
+.btn.pri:hover{background:var(--azul-osc);border-color:var(--azul-osc)}
+.btn.sm{padding:4px 10px;font-size:12.5px;margin-top:6px}
+.mapa-cab{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+#mapa{height:460px;border-radius:8px;border:1px solid var(--borde);background:#E8EEF4;z-index:0}
+.leyenda{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--texto-2);align-items:center}
+.leyenda i{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--azul);vertical-align:-2px;margin-right:6px}
+.leyenda i.u{box-shadow:0 0 0 3px var(--naranja)}
+.mk-wrap{background:none;border:0}
+.mk{display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--azul);color:#fff;font-weight:700;font-size:14px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);font-variant-numeric:tabular-nums}
+.mk.urg{box-shadow:0 0 0 4px var(--naranja),0 1px 4px rgba(0,0,0,.4)}
+.mk.sel{background:var(--azul-osc)}
+.pop h3{margin:0 0 2px;font-size:15px;color:var(--azul-osc)}
+.pop .l{font-size:12.5px;color:var(--texto-2);margin:1px 0}
+.pop ul{margin:6px 0 0;padding:0 0 0 16px;font-size:12.5px}
+.pop li{margin:2px 0}
+.leaflet-popup-content{margin:12px 14px}
+.graficos{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.graficos .panel{margin:0}
+.barras{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.bar{display:grid;grid-template-columns:minmax(90px,38%) 1fr 34px;gap:8px;align-items:center;width:100%;background:none;border:0;padding:3px 4px;border-radius:6px;font:inherit;color:var(--texto);text-align:left;cursor:pointer}
+.bar.ancho{grid-template-columns:minmax(90px,34%) 1fr 86px}
+.bar.largo{grid-template-columns:minmax(120px,54%) 1fr 34px}
+.bar:hover{background:var(--gris-t)}
+.bar.act{background:var(--azul-t);box-shadow:inset 0 0 0 1.5px var(--azul)}
+.bar .nom{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .pista{background:var(--gris);border-radius:5px;height:14px;overflow:hidden}
+.bar .rel{display:block;height:100%;background:var(--azul);border-radius:5px;min-width:2px}
+.bar.urg .rel{background:var(--naranja)}
+.bar.neu .rel{background:var(--neutro)}
+.bar .n{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.vacio-g{font-size:13px;color:var(--texto-2)}
+.tabla-cab{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.tabla-cab h2{margin:0}
+.tabla-cab .cuenta{font-size:13px;color:var(--texto-2)}
+.scroll{overflow-x:auto;border:1px solid var(--borde);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:1180px;table-layout:fixed;background:#fff}
+td{overflow-wrap:break-word}
+th,td{padding:10px 9px;text-align:left;vertical-align:top;border-bottom:1px solid #E6E8EB;font-size:13.5px}
+th{background:var(--gris-t);position:sticky;top:0;white-space:nowrap;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--azul-osc)}
+th button{all:unset;cursor:pointer;font-weight:700;text-transform:inherit;letter-spacing:inherit;display:inline-flex;gap:4px;align-items:center;border-radius:4px;padding:2px 4px}
+th button .fl{opacity:.35;font-size:11px}
+th[aria-sort] button .fl{opacity:1;color:var(--naranja)}
+tbody tr:hover{background:#FAFBFD}
+td.dias .badge{white-space:nowrap}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-weight:700;font-size:12.5px;border:1px solid transparent;font-variant-numeric:tabular-nums}
+.badge.u3{background:var(--naranja-t);color:var(--naranja-txt);border-color:var(--naranja);border-left-width:5px}
+.badge.u7{background:var(--naranja-t);color:var(--naranja-txt)}
+.badge.u14{background:var(--azul-t);color:var(--azul-osc)}
+.badge.u30{background:var(--gris-t);color:var(--azul-osc);border-color:var(--gris)}
+td .cierre{display:block;font-size:12.5px;color:var(--texto-2);margin-top:3px}
+td .id{font-weight:700;white-space:nowrap}
+td .nombre{font-weight:600}
+td .desc{display:block;font-size:12.5px;color:var(--texto-2);margin-top:2px;max-width:420px}
+td .tipo{display:block;font-size:12px;color:var(--texto-2);margin-top:2px}
+td .org{font-weight:600}
+td .uni{display:block;font-size:12.5px;color:var(--texto-2)}
+td .min{display:block;font-size:12px;color:var(--texto-2)}
+.etq{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;background:var(--azul-t);color:var(--azul-osc);margin:3px 4px 0 0}
+.etq.nueva{background:var(--azul-osc);color:#fff}
+td.monto{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+.sinmonto{color:var(--texto-2)}
+.pag{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;font-size:13px;color:var(--texto-2)}
+.pag button{padding:6px 12px;border-radius:8px;border:1px solid var(--azul);background:#fff;color:var(--azul);font:inherit;font-weight:600;cursor:pointer}
+.pag button:disabled{border-color:var(--gris);color:#8A949E;cursor:not-allowed}
+.estado{padding:36px 16px;text-align:center;color:var(--texto-2)}
+.estado strong{display:block;color:var(--azul-osc);font-size:16px;margin-bottom:4px}
+footer{max-width:1280px;margin:0 auto;padding:6px 20px 32px;font-size:12.5px;color:var(--texto-2)}
+footer p{margin:4px 0}
+@media (max-width:1000px){
+  .graficos{grid-template-columns:1fr}
+  .filtros{grid-template-columns:1fr 1fr}
+  .filtros .busca{grid-column:1/-1}
+}
+@media (max-width:760px){
+  main{padding:14px 12px}
+  .cab h1{font-size:21px}
+  .cab .meta{text-align:left}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi .val{font-size:22px}
+  #mapa{height:380px}
+  .filtros{grid-template-columns:1fr}
+  .scroll{border:0}
+  table,thead,tbody,tr,td{display:block;min-width:0;width:100%}
+  thead{position:absolute;left:-9999px}
+  tr{background:#fff;border:1px solid var(--borde);border-radius:10px;margin-bottom:10px;padding:6px 0}
+  td{border:0;padding:6px 14px;text-align:left!important}
+  td::before{content:attr(data-et);display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--texto-2)}
+  td.dias::before{display:none}
+  td .desc{max-width:none}
+  colgroup{display:none}
+}
+@media print{
+  .filtros,.pag,.btn,#mapa,.leyenda{display:none!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<header class="cab">
+  <div class="cab-in">
+    <div>
+      <h1>Licitaciones activas · Región de O'Higgins</h1>
+      <p class="sub">Cámara Chilena de la Construcción · Sede Región de O'Higgins · Estudios</p>
+    </div>
+    <div class="meta">
+      <strong id="actualizado">Cargando datos…</strong>
+      Fuente: Mercado Público (Dirección ChileCompra)
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="avisos"></div>
+
+  <section class="kpis" id="kpis" aria-label="Indicadores"></section>
+
+  <section class="panel" aria-label="Filtros">
+    <h2>Filtros</h2>
+    <div class="filtros">
+      <div class="busca">
+        <label for="f-q">Buscar (ID, nombre, organismo, comuna, rubro)</label>
+        <input type="search" id="f-q" placeholder="Ej.: pavimentación Rancagua, 1509-5-LE26">
+      </div>
+      <div><label for="f-sector">Sector</label><select id="f-sector"></select></div>
+      <div><label for="f-organismo">Organismo comprador</label><select id="f-organismo"></select></div>
+      <div><label for="f-comuna">Comuna</label><select id="f-comuna"></select></div>
+      <div><label for="f-tramo">Días restantes</label><select id="f-tramo"></select></div>
+      <div><label for="f-monto">Monto estimado</label><select id="f-monto"></select></div>
+      <div><label for="f-tipo">Tipo de licitación</label><select id="f-tipo"></select></div>
+      <div><label for="f-rubro">Rubro</label><select id="f-rubro"></select></div>
+      <div class="fila2">
+        <label class="chk"><input type="checkbox" id="f-afin"> Solo rubros afines a construcción</label>
+        <label class="chk"><input type="checkbox" id="f-nueva"> Solo nuevas (últimos 2 días)</label>
+        <span class="esp"></span>
+        <button class="btn" type="button" id="limpiar">Limpiar filtros</button>
+        <button class="btn pri" type="button" id="exportar">Descargar CSV</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Mapa por comuna">
+    <div class="mapa-cab">
+      <div>
+        <h2>Mapa de licitaciones por comuna</h2>
+        <p class="nota">Cada círculo agrupa las licitaciones de una comuna según los filtros activos. Haga clic para ver el detalle.</p>
+      </div>
+      <button class="btn" type="button" id="centrar">Ver toda la región</button>
+    </div>
+    <div id="mapa" role="region" aria-label="Mapa de licitaciones por comuna"></div>
+    <div class="leyenda">
+      <span><i></i>Tamaño y número = licitaciones vigentes</span>
+      <span><i class="u"></i>Anillo naranja = hay cierres en 7 días o menos</span>
+      <span id="mapa-nota"></span>
+    </div>
+  </section>
+
+  <section class="graficos" aria-label="Resumen gráfico">
+    <div class="panel"><h2>Por plazo de cierre</h2><p class="nota">Licitaciones según días que faltan.</p><div class="barras" id="g-plazo"></div></div>
+    <div class="panel"><h2>Por tipo de licitación</h2><p class="nota">Tramo en UTM; sirve cuando el monto no se publica.</p><div class="barras" id="g-tipo"></div></div>
+    <div class="panel"><h2>Por tramo de monto (CLP)</h2><p class="nota">Muchas licitaciones no publican monto estimado.</p><div class="barras" id="g-monto"></div></div>
+    <div class="panel"><h2>Por sector</h2><p class="nota">Número de licitaciones.</p><div class="barras" id="g-sector"></div></div>
+    <div class="panel"><h2>Monto informado por sector</h2><p class="nota">Suma en CLP, solo licitaciones con monto.</p><div class="barras" id="g-sector-m"></div></div>
+    <div class="panel"><h2>Por comuna (top 8)</h2><p class="nota">Número de licitaciones.</p><div class="barras" id="g-comuna"></div></div>
+    <div class="panel"><h2>Monto informado por comuna (top 8)</h2><p class="nota">Suma en CLP, solo licitaciones con monto.</p><div class="barras" id="g-comuna-m"></div></div>
+    <div class="panel"><h2>Organismos compradores (top 8)</h2><p class="nota">Número de licitaciones.</p><div class="barras" id="g-org"></div></div>
+    <div class="panel"><h2>Rubros (top 8)</h2><p class="nota">Según la clasificación de Mercado Público.</p><div class="barras" id="g-rubro"></div></div>
+  </section>
+
+  <section class="panel" aria-label="Listado de licitaciones">
+    <div class="tabla-cab">
+      <h2>Licitaciones vigentes</h2>
+      <span class="cuenta" id="cuenta" aria-live="polite"></span>
+    </div>
+    <div class="scroll">
+      <table>
+        <caption style="position:absolute;left:-9999px">Licitaciones vigentes en la Región de O'Higgins</caption>
+        <colgroup>
+          <col style="width:10%"><col style="width:11%"><col style="width:22%"><col style="width:17%">
+          <col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:10%">
+        </colgroup>
+        <thead><tr id="cabecera"></tr></thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </div>
+    <div id="estado"></div>
+    <div class="pag" id="pag"></div>
+  </section>
+</main>
+
+<footer>
+  <p id="pie-datos"></p>
+  <p><strong>Fuente:</strong> Dirección ChileCompra, API de Mercado Público (api.mercadopublico.cl). Los campos «Sector», «Rubro afín a construcción», «Nueva», la ubicación en el mapa (centro referencial de cada comuna) y los días restantes son cálculos referenciales de la CChC O'Higgins, no datos oficiales de ChileCompra.</p>
+  <p>Mapa: © colaboradores de OpenStreetMap. Biblioteca Leaflet. Antes de decidir, revise siempre las bases, los plazos y las eventuales modificaciones en la ficha oficial de cada licitación en Mercado Público.</p>
+</footer>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+(function(){
+'use strict';
+var TZ='America/Santiago', DIA=86400000, POR_PAGINA=25;
+var $=function(s){return document.querySelector(s);};
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function norm(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/['’`]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
+function ahoraCL(){var s=new Date().toLocaleString('sv-SE',{timeZone:TZ});return Date.parse(s.replace(' ','T')+'Z');}
+function aMs(s){if(!s)return null;var t=Date.parse(String(s).slice(0,19)+'Z');return isNaN(t)?null:t;}
+function fmtFecha(s){var m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(s||'');return m?m[3]+'-'+m[2]+'-'+m[1]+' '+m[4]+':'+m[5]:'—';}
+var nf=new Intl.NumberFormat('es-CL');
+function esCLP(l){return l.monto!=null && (!l.moneda||String(l.moneda).toUpperCase()==='CLP');}
+function fmtMM(v){return v>=1e6?'$ '+nf.format(Math.round(v/1e6))+' MM':'$ '+nf.format(Math.round(v/1e3))+' mil';}
+function fmtMonto(m,mon){
+  if(m==null)return '<span class="sinmonto">No informado</span>';
+  var c=(mon||'').toUpperCase();
+  if(c==='CLP'||c==='')return '$ '+nf.format(Math.round(m));
+  return nf.format(m)+' '+esc(c);
+}
+
+/* Comunas de la Región de O'Higgins: nombre oficial y ubicación referencial (centro urbano). */
+var COMUNAS=[
+ ['Rancagua',-34.1708,-70.7444],['Codegua',-34.0333,-70.6667],['Coinco',-34.2667,-70.9500],['Coltauco',-34.2833,-71.0833],
+ ['Doñihue',-34.2167,-70.9667],['Graneros',-34.0667,-70.7333],['Las Cabras',-34.3000,-71.3167],['Machalí',-34.1833,-70.6500],
+ ['Malloa',-34.4500,-70.9500],['Mostazal',-33.9833,-70.7000],['Olivar',-34.2167,-70.8333],['Peumo',-34.3833,-71.1667],
+ ['Pichidegua',-34.3500,-71.3000],['Quinta de Tilcoco',-34.3667,-71.0167],['Rengo',-34.4167,-70.8667],['Requínoa',-34.2833,-70.8167],
+ ['San Vicente',-34.4333,-71.0833],['Pichilemu',-34.3833,-72.0000],['La Estrella',-34.2000,-71.6833],['Litueche',-34.1167,-71.7333],
+ ['Marchihue',-34.4000,-71.6167],['Navidad',-33.9500,-71.8333],['Paredones',-34.6500,-71.9000],['San Fernando',-34.5833,-70.9833],
+ ['Chépica',-34.7333,-71.2667],['Chimbarongo',-34.7167,-71.0500],['Lolol',-34.7333,-71.6500],['Nancagua',-34.6667,-71.2000],
+ ['Palmilla',-34.6000,-71.3667],['Peralillo',-34.4833,-71.4833],['Placilla',-34.6333,-71.1000],['Pumanque',-34.6000,-71.6500],
+ ['Santa Cruz',-34.6333,-71.3667]
+];
+var COM={}; COMUNAS.forEach(function(c){COM[norm(c[0])]={nombre:c[0],lat:c[1],lng:c[2]};});
+function comunaCanon(raw){var k=norm(raw);if(!k)return '';if(COM[k])return COM[k].nombre;return String(raw).trim();}
+
+var TRAMOS=[['0-3','0 a 3 días'],['4-7','4 a 7 días'],['8-14','8 a 14 días'],['15-30','15 a 30 días'],['31+','Más de 30 días']];
+function tramo(d){return d<=3?'0-3':d<=7?'4-7':d<=14?'8-14':d<=30?'15-30':'31+';}
+var MONTOS=[['a','Menos de $10 MM'],['b','$10 a $50 MM'],['c','$50 a $200 MM'],['d','$200 a $1.000 MM'],['e','Más de $1.000 MM'],['otra','En UF, UTM u otra moneda'],['sin','Monto no informado']];
+function tramoMonto(l){
+  if(l.monto==null)return 'sin';
+  if(!esCLP(l))return 'otra';
+  var m=l.monto;return m<1e7?'a':m<5e7?'b':m<2e8?'c':m<1e9?'d':'e';
+}
+var ORDEN_TIPOS=['L1','LE','LP','LQ','LR','LS'];
+
+var filas=[], datos=null;
+var F0={q:'',sector:'',organismo:'',comuna:'',tramo:'',monto:'',tipo:'',rubro:'',afin:false,nueva:false};
+var F=Object.assign({},F0);
+var orden={col:'dias',dir:1}, pagina=1;
+
+var COLS=[
+  {k:'dias',t:'Plazo'},{k:'id',t:'ID'},{k:'nombre',t:'Licitación'},{k:'organismo',t:'Organismo comprador'},
+  {k:'comuna',t:'Comuna'},{k:'sector',t:'Sector'},{k:'rubro',t:'Rubro'},{k:'monto',t:'Monto'}
+];
+
+function prepararFilas(lics){
+  var ahora=ahoraCL(), hoy0=Math.floor(ahora/DIA)*DIA, out=[];
+  lics.forEach(function(l){
+    var ms=aMs(l.cierre);
+    if(ms!=null && ms<ahora) return;               // ya cerró desde la última actualización
+    var dias=ms==null?9999:Math.round((Math.floor(ms/DIA)*DIA-hoy0)/DIA);
+    var rubros=l.rubros||[], comuna=comunaCanon(l.comuna);
+    var v=l.visto?Date.parse(l.visto+'T00:00:00Z'):null;
+    out.push({
+      l:l,ms:ms==null?Infinity:ms,dias:dias,tramo:tramo(dias),mt:tramoMonto(l),comuna:comuna,rubro:rubros[0]||'',
+      nueva:v!=null && (hoy0-v)<=2*DIA,
+      texto:norm([l.id,l.nombre,l.descripcion,l.organismo,l.unidad,comuna,l.sector,rubros.join(' ')].join(' '))
+    });
+  });
+  return out;
+}
+
+function pasa(f,omitir){
+  var l=f.l;
+  if(F.q){var ts=norm(F.q).split(' ').filter(Boolean);for(var i=0;i<ts.length;i++){if(f.texto.indexOf(ts[i])<0)return false;}}
+  if(omitir!=='sector' && F.sector && l.sector!==F.sector)return false;
+  if(omitir!=='organismo' && F.organismo && l.organismo!==F.organismo)return false;
+  if(omitir!=='comuna' && F.comuna && f.comuna!==F.comuna)return false;
+  if(omitir!=='tramo' && F.tramo && f.tramo!==F.tramo)return false;
+  if(omitir!=='monto' && F.monto && f.mt!==F.monto)return false;
+  if(omitir!=='tipo' && F.tipo && l.tipo!==F.tipo)return false;
+  if(omitir!=='rubro' && F.rubro && (l.rubros||[]).indexOf(F.rubro)<0)return false;
+  if(F.afin && !l.afin)return false;
+  if(F.nueva && !f.nueva)return false;
+  return true;
+}
+function filtradas(omitir){return filas.filter(function(f){return pasa(f,omitir);});}
+
+function cmp(a,b){
+  var c=orden.col, r;
+  if(c==='dias')r=(a.ms===b.ms)?0:(a.ms<b.ms?-1:1);
+  else if(c==='monto'){
+    // Orden: montos en CLP (según dirección elegida), luego otras monedas, luego sin monto.
+    // No se comparan números de monedas distintas (4.200 UF no es menos que $6.500.000).
+    var ra=a.l.monto==null?2:(esCLP(a.l)?0:1), rb=b.l.monto==null?2:(esCLP(b.l)?0:1);
+    if(ra!==rb)return ra-rb;
+    if(ra===2)return a.l.id.localeCompare(b.l.id);
+    if(ra===1){var ma=String(a.l.moneda||''),mb=String(b.l.moneda||'');if(ma!==mb)return ma.localeCompare(mb);}
+    r=a.l.monto-b.l.monto;
+  }
+  else {
+    var u=(c==='rubro'?a.rubro:c==='comuna'?a.comuna:a.l[c])||'', v=(c==='rubro'?b.rubro:c==='comuna'?b.comuna:b.l[c])||'';
+    r=u.localeCompare(v,'es');
+  }
+  return r*orden.dir||a.l.id.localeCompare(b.l.id);
+}
+
+function contar(arr,fn){var m={};arr.forEach(function(x){var k=fn(x);if(k)m[k]=(m[k]||0)+1;});return m;}
+function sumar(arr,kfn){var m={};arr.forEach(function(x){var k=kfn(x);if(k&&esCLP(x.l))m[k]=(m[k]||0)+x.l.monto;});return m;}
+function ordenar(m){return Object.keys(m).sort(function(a,b){return m[b]-m[a]||a.localeCompare(b,'es');});}
+
+function llenarSelect(id,etiqueta,valores){
+  var sel=$(id), act=sel.value;
+  var html='<option value="">'+esc(etiqueta)+'</option>';
+  valores.forEach(function(v){html+='<option value="'+esc(v[0])+'">'+esc(v[1])+'</option>';});
+  sel.innerHTML=html; sel.value=act;
+}
+function prepararFiltros(){
+  var s=contar(filas,function(f){return f.l.sector;}), o=contar(filas,function(f){return f.l.organismo;}),
+      c=contar(filas,function(f){return f.comuna;}), t=contar(filas,function(f){return f.l.tipo;}), r={};
+  filas.forEach(function(f){(f.l.rubros||[]).forEach(function(x){r[x]=(r[x]||0)+1;});});
+  llenarSelect('#f-sector','Todos los sectores',ordenar(s).map(function(k){return [k,k+' ('+s[k]+')'];}));
+  llenarSelect('#f-organismo','Todos los organismos',ordenar(o).map(function(k){return [k,k+' ('+o[k]+')'];}));
+  llenarSelect('#f-comuna','Todas las comunas',ordenar(c).map(function(k){return [k,k+' ('+c[k]+')'];}));
+  llenarSelect('#f-tipo','Todos los tipos',ordenar(t).map(function(k){
+    var n=(filas.filter(function(f){return f.l.tipo===k;})[0]||{l:{}}).l.tipo_nombre||k;return [k,k+' · '+n+' ('+t[k]+')'];}));
+  llenarSelect('#f-rubro','Todos los rubros',ordenar(r).map(function(k){return [k,k+' ('+r[k]+')'];}));
+  var tc=contar(filas,function(f){return f.tramo;});
+  llenarSelect('#f-tramo','Cualquier plazo',TRAMOS.map(function(x){return [x[0],x[1]+' ('+(tc[x[0]]||0)+')'];}));
+  var mc=contar(filas,function(f){return f.mt;});
+  llenarSelect('#f-monto','Cualquier monto',MONTOS.map(function(x){return [x[0],x[1]+' ('+(mc[x[0]]||0)+')'];}));
+}
+
+function mediana(v){if(!v.length)return null;v=v.slice().sort(function(a,b){return a-b;});var m=Math.floor(v.length/2);return v.length%2?v[m]:(v[m-1]+v[m])/2;}
+function kpis(arr){
+  var total=filas.length, n=arr.length;
+  var urg=arr.filter(function(f){return f.dias<=7;}).length;
+  var nuevas=arr.filter(function(f){return f.nueva;}).length;
+  var afin=arr.filter(function(f){return f.l.afin;}).length;
+  var clp=arr.filter(function(f){return esCLP(f.l);});
+  var suma=clp.reduce(function(a,f){return a+f.l.monto;},0);
+  var med=mediana(clp.map(function(f){return f.l.monto;}));
+  var mayor=clp.reduce(function(a,f){return (!a||f.l.monto>a.l.monto)?f:a;},null);
+  $('#kpis').innerHTML=
+    '<div class="kpi"><div class="et">Licitaciones vigentes</div><div class="val">'+nf.format(n)+'</div><div class="det">'+(n===total?'Toda la región':'de '+nf.format(total)+' en la región')+'</div></div>'+
+    '<div class="kpi alerta"><div class="et">Cierran en 7 días o menos</div><div class="val">'+nf.format(urg)+'</div><div class="det">Requieren decisión pronta</div></div>'+
+    '<div class="kpi"><div class="et">Nuevas (últimos 2 días)</div><div class="val">'+nf.format(nuevas)+'</div><div class="det">Aparecieron desde la última revisión</div></div>'+
+    '<div class="kpi"><div class="et">Afines a construcción</div><div class="val">'+nf.format(afin)+'</div><div class="det">Clasificación referencial</div></div>'+
+    '<div class="kpi"><div class="et">Monto informado (CLP)</div><div class="val">'+(clp.length?fmtMM(suma):'—')+'</div><div class="det">'+(clp.length?'Mediana '+fmtMM(med)+' · ':'')+nf.format(clp.length)+' de '+nf.format(n)+' con monto</div></div>'+
+    '<div class="kpi"><div class="et">Mayor monto informado</div><div class="val">'+(mayor?fmtMM(mayor.l.monto):'—')+'</div><div class="det">'+(mayor?esc(mayor.l.organismo):'Sin montos en CLP')+'</div></div>';
+}
+
+/* ---- Gráficos de barras ---- */
+function barras(id,items,key,opts){
+  opts=opts||{};
+  var el=$(id), max=0;
+  items.forEach(function(i){if(i.val>max)max=i.val;});
+  if(!items.length||!max){el.innerHTML='<div class="vacio-g">Sin datos para mostrar.</div>';return;}
+  el.innerHTML=items.map(function(i){
+    var act=(F[key]===i.k)?' act':'', cls=(i.urg?' urg':'')+(i.neu?' neu':'')+(opts.ancho?' ancho':'')+(opts.largo?' largo':'');
+    return '<button type="button" class="bar'+act+cls+'" data-t="'+key+'" data-k="'+esc(i.k)+'" aria-pressed="'+(act?'true':'false')+'" title="Filtrar: '+esc(i.nombre)+'">'+
+      '<span class="nom">'+esc(i.nombre)+'</span><span class="pista"><span class="rel" style="width:'+Math.max(2,Math.round(i.val/max*100))+'%"></span></span><span class="n">'+esc(i.txt)+'</span></button>';
+  }).join('');
+}
+function top(m,n){return ordenar(m).slice(0,n);}
+function graficos(){
+  var a,c,m,t;
+  a=filtradas('tramo'); c=contar(a,function(f){return f.tramo;});
+  barras('#g-plazo',TRAMOS.map(function(x,i){return {k:x[0],nombre:x[1],val:c[x[0]]||0,txt:nf.format(c[x[0]]||0),urg:i<2};}),'tramo');
+
+  a=filtradas('tipo'); c=contar(a,function(f){return f.l.tipo;});
+  var nombres={}; filas.forEach(function(f){if(f.l.tipo&&!nombres[f.l.tipo])nombres[f.l.tipo]=(f.l.tipo_nombre||'').replace(/^Pública /,'');});
+  t=Object.keys(c).sort(function(x,y){var i=ORDEN_TIPOS.indexOf(x),j=ORDEN_TIPOS.indexOf(y);i=i<0?99:i;j=j<0?99:j;return i-j||x.localeCompare(y);});
+  barras('#g-tipo',t.map(function(k){return {k:k,nombre:k+(nombres[k]?' · '+nombres[k]:''),val:c[k],txt:nf.format(c[k])};}),'tipo',{largo:true});
+
+  a=filtradas('monto'); c=contar(a,function(f){return f.mt;});
+  barras('#g-monto',MONTOS.map(function(x){return {k:x[0],nombre:x[1],val:c[x[0]]||0,txt:nf.format(c[x[0]]||0),neu:(x[0]==='sin'||x[0]==='otra')};}),'monto',{largo:true});
+
+  a=filtradas('sector'); c=contar(a,function(f){return f.l.sector;});
+  barras('#g-sector',top(c,8).map(function(k){return {k:k,nombre:k,val:c[k],txt:nf.format(c[k])};}),'sector');
+  m=sumar(a,function(f){return f.l.sector;});
+  barras('#g-sector-m',top(m,8).map(function(k){return {k:k,nombre:k,val:m[k],txt:fmtMM(m[k])};}),'sector',{ancho:true});
+
+  a=filtradas('comuna'); c=contar(a,function(f){return f.comuna;});
+  barras('#g-comuna',top(c,8).map(function(k){return {k:k,nombre:k,val:c[k],txt:nf.format(c[k])};}),'comuna');
+  m=sumar(a,function(f){return f.comuna;});
+  barras('#g-comuna-m',top(m,8).map(function(k){return {k:k,nombre:k,val:m[k],txt:fmtMM(m[k])};}),'comuna',{ancho:true});
+
+  a=filtradas('organismo'); c=contar(a,function(f){return f.l.organismo;});
+  barras('#g-org',top(c,8).map(function(k){return {k:k,nombre:k,val:c[k],txt:nf.format(c[k])};}),'organismo',{largo:true});
+
+  a=filtradas('rubro'); c={};
+  a.forEach(function(f){(f.l.rubros||[]).forEach(function(x){c[x]=(c[x]||0)+1;});});
+  barras('#g-rubro',top(c,8).map(function(k){return {k:k,nombre:k,val:c[k],txt:nf.format(c[k])};}),'rubro',{largo:true});
+}
+
+/* ---- Mapa ---- */
+var mapa=null, capa=null, ajustado=false;
+function iniciarMapa(){
+  if(typeof L==='undefined'){$('#mapa').innerHTML='<div class="estado"><strong>No se pudo cargar el mapa</strong>Los gráficos y el listado siguen disponibles.</div>';return;}
+  mapa=L.map('mapa',{scrollWheelZoom:false}).setView([-34.4,-71.15],9);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores de OpenStreetMap</a>',
+    maxZoom:18}).addTo(mapa);
+  capa=L.layerGroup().addTo(mapa);
+  mapa.on('click',function(){mapa.scrollWheelZoom.enable();});
+  mapa.on('mouseout',function(){mapa.scrollWheelZoom.disable();});
+}
+function limitesMapa(){
+  var pts=[];filas.forEach(function(f){var c=COM[norm(f.comuna)];if(c)pts.push([c.lat,c.lng]);});
+  return pts.length?L.latLngBounds(pts):null;
+}
+function centrarMapa(){
+  if(!mapa)return;
+  var b=limitesMapa();
+  if(b)mapa.fitBounds(b,{padding:[40,40],maxZoom:10});else mapa.setView([-34.4,-71.15],9);
+}
+function mapaActualizar(){
+  if(!mapa)return;
+  var a=filtradas('comuna'), g={}, sin=0;
+  a.forEach(function(f){
+    var k=norm(f.comuna);
+    if(!COM[k]){sin++;return;}
+    (g[k]=g[k]||[]).push(f);
+  });
+  capa.clearLayers();
+  Object.keys(g).forEach(function(k){
+    var fs=g[k].slice().sort(function(x,y){return x.ms===y.ms?0:(x.ms<y.ms?-1:1);}), c=COM[k], n=fs.length;
+    var urg=fs.some(function(f){return f.dias<=7;}), sel=(F.comuna===c.nombre);
+    var clp=fs.filter(function(f){return esCLP(f.l);}), suma=clp.reduce(function(s,f){return s+f.l.monto;},0);
+    var tam=Math.round(30+Math.min(34,Math.sqrt(n)*8));
+    var icono=L.divIcon({className:'mk-wrap',iconSize:[tam,tam],html:'<div class="mk'+(urg?' urg':'')+(sel?' sel':'')+'" style="width:'+tam+'px;height:'+tam+'px">'+n+'</div>'});
+    var lista=fs.slice(0,4).map(function(f){
+      var d=f.ms===Infinity?'sin fecha':(f.dias===0?'hoy':f.dias===1?'1 día':f.dias+' días');
+      return '<li><a href="'+esc(urlSegura(f.l))+'" target="_blank" rel="noopener noreferrer">'+esc(f.l.id)+'</a> · '+esc(d)+'<br>'+esc(String(f.l.nombre).slice(0,70))+'</li>';
+    }).join('');
+    var html='<div class="pop"><h3>'+esc(c.nombre)+'</h3>'+
+      '<div class="l"><strong>'+n+'</strong> licitaci'+(n===1?'ón':'ones')+' · '+fs.filter(function(f){return f.dias<=7;}).length+' cierran en 7 días o menos</div>'+
+      '<div class="l">'+(clp.length?'Monto informado: '+fmtMM(suma)+' ('+clp.length+' con monto)':'Sin montos en CLP informados')+'</div>'+
+      '<ul>'+lista+'</ul>'+(n>4?'<div class="l">y '+(n-4)+' más…</div>':'')+
+      '<button type="button" class="btn sm pm" data-comuna="'+esc(c.nombre)+'">'+(sel?'Quitar filtro de comuna':'Filtrar solo esta comuna')+'</button></div>';
+    L.marker([c.lat,c.lng],{icon:icono,title:c.nombre+': '+n}).bindPopup(html,{maxWidth:300}).addTo(capa);
+  });
+  $('#mapa-nota').textContent=sin?(nf.format(sin)+' licitaciones no se muestran en el mapa por no informar una comuna reconocible.'):'';
+  if(!ajustado){ajustado=true;centrarMapa();}
+}
+
+function badge(f){
+  var d=f.dias, cls=d<=3?'u3':d<=7?'u7':d<=14?'u14':'u30', txt;
+  if(f.ms===Infinity)return '<span class="badge u30">Sin fecha</span>';
+  if(d===0)txt='Hoy '+(f.l.cierre||'').slice(11,16); else if(d===1)txt='1 día'; else txt=d+' días';
+  return '<span class="badge '+cls+'">'+esc(txt)+'</span>';
+}
+function urlSegura(l){
+  var u=String(l.url||'');
+  return /^https:\/\/www\.mercadopublico\.cl\//.test(u)?u:'https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion='+encodeURIComponent(l.id);
+}
+
+function cabecera(){
+  $('#cabecera').innerHTML=COLS.map(function(c){
+    var act=orden.col===c.k, flecha=act?(orden.dir===1?'▲':'▼'):'↕';
+    return '<th scope="col"'+(act?' aria-sort="'+(orden.dir===1?'ascending':'descending')+'"':'')+'><button type="button" data-ord="'+c.k+'">'+esc(c.t)+' <span class="fl" aria-hidden="true">'+flecha+'</span></button></th>';
+  }).join('');
+}
+
+function tabla(arr){
+  var total=arr.length, paginas=Math.max(1,Math.ceil(total/POR_PAGINA));
+  if(pagina>paginas)pagina=paginas;
+  var ini=(pagina-1)*POR_PAGINA, vis=arr.slice(ini,ini+POR_PAGINA);
+  $('#cuenta').textContent=total?('Mostrando '+(ini+1)+'–'+(ini+vis.length)+' de '+nf.format(total)):'Sin resultados';
+  $('#cuerpo').innerHTML=vis.map(function(f){
+    var l=f.l, u=urlSegura(l), rub=(l.rubros||[]);
+    var rubTxt=rub.length?esc(rub[0])+(rub.length>1?' <span class="uni">+'+(rub.length-1)+' más</span>':''):'<span class="sinmonto">—</span>';
+    return '<tr>'+
+      '<td class="dias" data-et="Plazo">'+badge(f)+'<span class="cierre">Cierra '+esc(fmtFecha(l.cierre))+'</span></td>'+
+      '<td data-et="ID"><a class="id" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(l.id)+'</a><br><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Ver ficha ↗</a></td>'+
+      '<td data-et="Licitación"><span class="nombre">'+esc(l.nombre)+'</span>'+(l.descripcion&&l.descripcion!==l.nombre?'<span class="desc">'+esc(l.descripcion.slice(0,140))+(l.descripcion.length>140?'…':'')+'</span>':'')+
+        (l.tipo?'<span class="tipo">'+esc(l.tipo)+' · '+esc(l.tipo_nombre||'')+'</span>':'')+(f.nueva?'<span class="etq nueva">Nueva</span>':'')+(l.afin?'<span class="etq">Afín a construcción</span>':'')+'</td>'+
+      '<td data-et="Organismo comprador"><span class="org">'+esc(l.organismo)+'</span>'+(l.unidad?'<span class="uni">'+esc(l.unidad)+'</span>':'')+(l.ministerio?'<span class="min">'+esc(l.ministerio)+'</span>':'')+'</td>'+
+      '<td data-et="Comuna">'+esc(f.comuna||'—')+'</td>'+
+      '<td data-et="Sector">'+esc(l.sector||'—')+'</td>'+
+      '<td data-et="Rubro">'+rubTxt+'</td>'+
+      '<td class="monto" data-et="Monto estimado">'+fmtMonto(l.monto,l.moneda)+'</td>'+
+    '</tr>';
+  }).join('');
+  var est=$('#estado');
+  if(!filas.length){
+    est.innerHTML='<div class="estado"><strong>Aún no hay datos cargados</strong>La primera actualización se ejecuta automáticamente; también puede lanzarse a mano desde la pestaña Actions del repositorio.</div>';
+  } else if(!total){
+    est.innerHTML='<div class="estado"><strong>No hay licitaciones con estos filtros</strong>Pruebe quitando algún filtro o use «Limpiar filtros».</div>';
+  } else est.innerHTML='';
+  $('#pag').innerHTML=total>POR_PAGINA?
+    '<button type="button" id="p-ant"'+(pagina<=1?' disabled':'')+'>← Anterior</button><span>Página '+pagina+' de '+paginas+'</span><button type="button" id="p-sig"'+(pagina>=paginas?' disabled':'')+'>Siguiente →</button>':'';
+}
+
+function render(){
+  var arr=filtradas().sort(cmp);
+  kpis(arr); mapaActualizar(); graficos(); cabecera(); tabla(arr);
+}
+
+function exportarCSV(){
+  var arr=filtradas().sort(cmp);
+  var cab=['ID','Licitación','Organismo','Unidad compradora','Comuna','Sector','Ministerio','Rubros','Tipo','Monto estimado','Moneda','Fecha de cierre','Días restantes','Link ficha'];
+  function q(v){v=String(v==null?'':v);return '"'+v.replace(/"/g,'""')+'"';}
+  var lin=[cab.map(q).join(';')];
+  arr.forEach(function(f){var l=f.l;
+    lin.push([l.id,l.nombre,l.organismo,l.unidad,f.comuna,l.sector,l.ministerio||'',(l.rubros||[]).join(' | '),l.tipo||'',l.monto==null?'':l.monto,l.moneda||'',fmtFecha(l.cierre),f.ms===Infinity?'':f.dias,urlSegura(l)].map(q).join(';'));
+  });
+  var blob=new Blob(['﻿'+lin.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'), hoy=new Date().toISOString().slice(0,10);
+  a.href=URL.createObjectURL(blob); a.download='licitaciones_ohiggins_'+hoy+'.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+}
+
+function ligar(){
+  var map={'#f-sector':'sector','#f-organismo':'organismo','#f-comuna':'comuna','#f-tramo':'tramo','#f-monto':'monto','#f-tipo':'tipo','#f-rubro':'rubro'};
+  Object.keys(map).forEach(function(id){$(id).addEventListener('change',function(e){F[map[id]]=e.target.value;pagina=1;render();});});
+  var t; $('#f-q').addEventListener('input',function(e){clearTimeout(t);var v=e.target.value;t=setTimeout(function(){F.q=v;pagina=1;render();},180);});
+  $('#f-afin').addEventListener('change',function(e){F.afin=e.target.checked;pagina=1;render();});
+  $('#f-nueva').addEventListener('change',function(e){F.nueva=e.target.checked;pagina=1;render();});
+  $('#limpiar').addEventListener('click',function(){
+    F=Object.assign({},F0);
+    $('#f-q').value='';$('#f-afin').checked=false;$('#f-nueva').checked=false;Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
+  });
+  $('#exportar').addEventListener('click',exportarCSV);
+  $('#centrar').addEventListener('click',centrarMapa);
+  document.addEventListener('click',function(e){
+    var pm=e.target.closest&&e.target.closest('.pm');
+    if(pm){var nom=pm.getAttribute('data-comuna');F.comuna=(F.comuna===nom)?'':nom;$('#f-comuna').value=F.comuna;pagina=1;if(mapa)mapa.closePopup();render();return;}
+    var b=e.target.closest&&e.target.closest('.bar');
+    if(b){var tp=b.getAttribute('data-t'),k=b.getAttribute('data-k');F[tp]=(F[tp]===k)?'':k;$('#f-'+tp).value=F[tp];pagina=1;render();return;}
+    var o=e.target.closest&&e.target.closest('[data-ord]');
+    if(o){var c=o.getAttribute('data-ord');if(orden.col===c)orden.dir=-orden.dir;else{orden.col=c;orden.dir=1;}pagina=1;render();return;}
+    if(e.target.id==='p-ant'){pagina--;render();$('#cuenta').scrollIntoView({block:'center'});}
+    if(e.target.id==='p-sig'){pagina++;render();$('#cuenta').scrollIntoView({block:'center'});}
+  });
+}
+
+function iniciar(d){
+  datos=d; filas=prepararFilas(d.licitaciones||[]);
+  $('#actualizado').textContent='Actualizado: '+(d.generado_texto||'—')+' (hora de Chile)';
+  var av='';
+  if(d.demo)av+='<div class="aviso demo" role="note">DATOS DE EJEMPLO: este panel muestra información simulada para probar el diseño. No corresponde a licitaciones reales.</div>';
+  if(d.parcial)av+='<div class="aviso info" role="note">Actualización parcial: faltan '+nf.format(d.sin_clasificar||0)+' licitaciones por clasificar. Se completarán en la próxima ejecución automática.</div>';
+  $('#avisos').innerHTML=av;
+  $('#pie-datos').textContent='Se revisaron '+nf.format(d.total_activas_pais||0)+' licitaciones activas del país; '+nf.format(d.total_region||0)+' correspondían a la Región de O\'Higgins al momento de la actualización.';
+  iniciarMapa(); prepararFiltros(); ligar(); render();
+}
+
+fetch('data.json?v='+Date.now(),{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+  .then(iniciar)
+  .catch(function(e){
+    $('#actualizado').textContent='Sin datos';
+    $('#avisos').innerHTML='<div class="aviso info" role="alert">No se pudieron cargar los datos ('+esc(e.message)+'). Si abrió el archivo directamente desde su computador, pruebe desde la dirección web publicada.</div>';
+    cabecera();
+  });
+})();
+</script>
+</body>
+</html>
