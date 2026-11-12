@@ -46,6 +46,15 @@ main{max-width:1280px;margin:0 auto;padding:20px}
 .filtros input:focus,.filtros select:focus,.btn:focus-visible,th button:focus-visible,.bar:focus-visible,.pag button:focus-visible{outline:3px solid var(--azul);outline-offset:1px}
 .fila2{display:flex;gap:18px;align-items:center;flex-wrap:wrap;grid-column:1/-1}
 .filtros label.chk{display:flex;margin:0}
+.alcance{display:flex;flex-wrap:wrap;margin:10px 0 16px}
+.seg{flex:1 1 240px;font:inherit;font-size:15px;font-weight:700;padding:13px 16px;border:2px solid var(--azul-osc);background:#fff;color:var(--azul-osc);cursor:pointer;min-height:48px}
+.seg+.seg{margin-left:-2px}
+.seg:first-child{border-radius:var(--radio) 0 0 var(--radio)}
+.seg:last-child{border-radius:0 var(--radio) var(--radio) 0}
+.seg[aria-pressed="true"]{background:var(--azul-osc);color:#fff;box-shadow:inset 0 -4px 0 var(--naranja)}
+.seg:focus-visible{outline:3px solid var(--azul);outline-offset:2px;position:relative}
+.seg span{font-weight:400;opacity:.85;margin-left:4px}
+@media(max-width:620px){.seg{flex-basis:100%}.seg+.seg{margin-left:0;margin-top:-2px}.seg:first-child{border-radius:var(--radio) var(--radio) 0 0}.seg:last-child{border-radius:0 0 var(--radio) var(--radio)}}
 .chk{gap:8px;align-items:center;font-size:14px;font-weight:600;color:var(--azul-osc);cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;accent-color:var(--azul)}
 .fila2 .esp{flex:1}
@@ -170,6 +179,10 @@ footer p{margin:4px 0}
 
   <section class="panel" aria-label="Filtros">
     <h2>Filtros</h2>
+    <div class="alcance" role="group" aria-label="Alcance del análisis">
+      <button type="button" class="seg" id="seg-cons" data-alc="1" aria-pressed="true">Construcción e infraestructura <span id="n-cons"></span></button>
+      <button type="button" class="seg" id="seg-todas" data-alc="0" aria-pressed="false">Todas las licitaciones <span id="n-todas"></span></button>
+    </div>
     <div class="filtros">
       <div class="busca">
         <label for="f-q">Buscar (ID, nombre, organismo, comuna, rubro)</label>
@@ -183,7 +196,6 @@ footer p{margin:4px 0}
       <div><label for="f-tipo">Tipo de licitación</label><select id="f-tipo"></select></div>
       <div><label for="f-rubro">Rubro</label><select id="f-rubro"></select></div>
       <div class="fila2">
-        <label class="chk"><input type="checkbox" id="f-afin"> Solo rubros afines a construcción</label>
         <label class="chk"><input type="checkbox" id="f-nueva"> Solo nuevas (últimos 2 días)</label>
         <span class="esp"></span>
         <button class="btn" type="button" id="limpiar">Limpiar filtros</button>
@@ -294,7 +306,7 @@ function tramoMonto(l){
 var ORDEN_TIPOS=['L1','LE','LP','LQ','LR','LS'];
 
 var filas=[], datos=null;
-var F0={q:'',sector:'',organismo:'',comuna:'',tramo:'',monto:'',tipo:'',rubro:'',afin:false,nueva:false};
+var F0={q:'',sector:'',organismo:'',comuna:'',tramo:'',monto:'',tipo:'',rubro:'',afin:true,nueva:false};
 var F=Object.assign({},F0);
 var orden={col:'dias',dir:1}, pagina=1;
 
@@ -562,15 +574,24 @@ function exportarCSV(){
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
 }
 
+function sincAlcance(){
+  $('#seg-cons').setAttribute('aria-pressed',F.afin?'true':'false');
+  $('#seg-todas').setAttribute('aria-pressed',F.afin?'false':'true');
+}
+function contarAlcance(){
+  $('#n-cons').textContent='('+nf.format(filas.filter(function(f){return f.l.afin;}).length)+')';
+  $('#n-todas').textContent='('+nf.format(filas.length)+')';
+}
+
 function ligar(){
   var map={'#f-sector':'sector','#f-organismo':'organismo','#f-comuna':'comuna','#f-tramo':'tramo','#f-monto':'monto','#f-tipo':'tipo','#f-rubro':'rubro'};
   Object.keys(map).forEach(function(id){$(id).addEventListener('change',function(e){F[map[id]]=e.target.value;pagina=1;render();});});
   var t; $('#f-q').addEventListener('input',function(e){clearTimeout(t);var v=e.target.value;t=setTimeout(function(){F.q=v;pagina=1;render();},180);});
-  $('#f-afin').addEventListener('change',function(e){F.afin=e.target.checked;pagina=1;render();});
+  document.querySelectorAll('.seg').forEach(function(b){b.addEventListener('click',function(){F.afin=b.getAttribute('data-alc')==='1';sincAlcance();pagina=1;render();});});
   $('#f-nueva').addEventListener('change',function(e){F.nueva=e.target.checked;pagina=1;render();});
   $('#limpiar').addEventListener('click',function(){
     F=Object.assign({},F0);
-    $('#f-q').value='';$('#f-afin').checked=false;$('#f-nueva').checked=false;Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
+    $('#f-q').value='';sincAlcance();$('#f-nueva').checked=false;Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
   });
   $('#exportar').addEventListener('click',exportarCSV);
   $('#centrar').addEventListener('click',centrarMapa);
@@ -594,7 +615,7 @@ function iniciar(d){
   if(d.parcial)av+='<div class="aviso info" role="note">Actualización parcial: faltan '+nf.format(d.sin_clasificar||0)+' licitaciones por clasificar. Se completarán en la próxima ejecución automática.</div>';
   $('#avisos').innerHTML=av;
   $('#pie-datos').textContent='Se revisaron '+nf.format(d.total_activas_pais||0)+' licitaciones activas del país; '+nf.format(d.total_region||0)+' correspondían a la Región de O\'Higgins al momento de la actualización.';
-  iniciarMapa(); prepararFiltros(); ligar(); render();
+  iniciarMapa(); prepararFiltros(); contarAlcance(); sincAlcance(); ligar(); render();
 }
 
 fetch('data.json?v='+Date.now(),{cache:'no-store'})
