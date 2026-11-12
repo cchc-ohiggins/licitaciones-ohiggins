@@ -93,10 +93,27 @@ TIPOS = {  # referencial; los códigos no listados se muestran tal cual
 AFIN_PREFIJOS = ("30", "72", "95", "8110", "3910", "4010", "4014", "4017")
 AFIN_TEXTO = re.compile(
     r"construcc|edificac|\bobras?\b|ingenieria|arquitect|pavimenta|urbaniz|"
-    r"infraestructura|reposicion de|mejoramiento de|conservacion de|habilitacion de|"
-    r"ampliacion de|normalizacion|alcantarillado|agua potable|\bpuente|camino|"
-    r"multicancha|sede social|paisajismo"
+    r"infraestructura|reposicion|mejoramiento|conservacion|habilitacion de|"
+    r"ampliacion|normalizacion|alcantarillado|agua potable|\bpuentes?\b|camino|"
+    r"multicancha|sede social|paisajismo|"
+    # vialidad y obras públicas
+    r"demarcacion|travesia|seguridad vial|carretera|\bruta\b|ciclovia|vereda|acera|solera|"
+    r"bacheo|pasarela|colector|saneamiento|embalse|\bcanal\b|\bmuro\b|defensas? fluvial|"
+    r"preinversion|\bpreinv\b|consultoria|estudio de (?:ingenieria|prefactibilidad|factibilidad)|"
+    # edificación y equipamiento comunitario
+    r"complejo deportivo|estadio|gimnasio|\bcancha|\bplaza\b|\bparque\b|edificio|"
+    r"\bcesfam\b|\bsapu\b|\bcecosf\b|\bescuela\b|\bliceo\b|jardin infantil|cuartel|\breten\b|"
+    r"obra civil|obras civiles"
 )
+# Sectores cuyas licitaciones se consideran, por definición, de obra o infraestructura (MOP y servicios).
+SECTORES_AFIN = {"Obras Públicas"}
+
+
+def es_afin_texto(nombre: str, rubros, sector: str) -> bool:
+    """Regla de texto/organismo para 'afín a construcción' (se suma a la regla por código de rubro)."""
+    if sector in SECTORES_AFIN:
+        return True
+    return bool(AFIN_TEXTO.search(normalizar(f"{nombre} {' '.join(rubros or [])}")))
 
 # Clasificación referencial del organismo comprador: (patrón, sector, ministerio).
 # El primer patrón que coincida define el resultado. Editable.
@@ -273,7 +290,7 @@ def construir_registro(lic: dict, item_lista: dict, hoy: str) -> dict:
             if cod and cod.startswith(AFIN_PREFIJOS):
                 afin_codigo = True
     nombre_lic = (lic.get("Nombre") or item_lista.get("Nombre") or "").strip()
-    afin = afin_codigo or bool(AFIN_TEXTO.search(normalizar(nombre_lic + " " + " ".join(rubros))))
+    afin = afin_codigo or es_afin_texto(nombre_lic, rubros, sector)
 
     monto = lic.get("MontoEstimado")
     monto = monto if es_numero(monto) and monto > 0 else None
@@ -448,6 +465,8 @@ def main() -> int:
             continue
         reg = dict(e["d"])
         reg["visto"] = e.get("v")
+        # Las reglas pueden mejorar entre ejecuciones: se reevalúan sobre lo ya guardado (solo suman, nunca quitan).
+        reg["afin"] = bool(reg.get("afin")) or es_afin_texto(reg.get("nombre", ""), reg.get("rubros"), reg.get("sector", ""))
         cierre_lista = fecha_iso(activas[cod].get("FechaCierre"))
         if cierre_lista:  # el listado trae el cierre vigente (por si se amplió el plazo)
             reg["cierre"] = cierre_lista
@@ -457,8 +476,8 @@ def main() -> int:
     registros.sort(key=lambda r: (r.get("cierre") or "9999", r.get("id") or ""))
 
     salida = {
-        "generado": ahora.isoformat(timespec="seconds"),
-        "generado_texto": ahora.strftime("%d-%m-%Y %H:%M"),
+        "generado": datetime.now(TZ).isoformat(timespec="seconds"),   # hora de término, no de inicio
+        "generado_texto": datetime.now(TZ).strftime("%d-%m-%Y %H:%M"),
         "fuente": "Dirección ChileCompra - API de Mercado Público",
         "total_activas_pais": len(activas),
         "total_region": len(registros),
