@@ -188,12 +188,12 @@ ESTUDIOS = re.compile(
     r"calculo estructural|proyectos? de (?:especialidades|arquitectura|ingenieria|electric|sanitari|climatizacion)|"
     r"diseno (?:estructural|sanitario|electrico|de ingenieria|de arquitectura)|"
     r"estudios? de (?:ingenieria|prefactibilidad|factibilidad|mecanica de suelos|impacto)|preinversion|\bpreinv\b|"
-    r"consultoria de (?:ingenieria|arquitectura|obras?)|fotogrametri|regularizacion de (?:vivienda|edificacion)|"
+    r"consultoria de (?:ingenieria|arquitectura|obras?|diseno)|servicio de consultoria de diseno|fotogrametri|regularizacion de (?:vivienda|edificacion)|"
     r"plan(?:o)? regulador|planificacion territorial|\bprc\b|seccional"
 )
 
 # Versión de las reglas: si cambia, los registros guardados se vuelven a consultar y reclasificar.
-REGLAS_VERSION = 5
+REGLAS_VERSION = 6
 LINEAS = ("Obras", "Materiales y suministros", "Maquinaria y equipos", "Estudios y servicios técnicos")
 MOTIVOS = ("codigo", "nombre", "organismo", "descripcion")
 
@@ -208,18 +208,43 @@ def _senales(t: str) -> set:
     return {m.group(0) for rx in rxs for m in rx.finditer(t)}
 
 
+# Los rubros de Mercado Público son categorías generales (p. ej. «Transporte de pasajeros por
+# carretera»). Solo se usan para clasificar los que hablan de construcción o de insumos de obra;
+# el resto se ignora, porque palabras sueltas como «carretera» o «ruta» llevaban a clasificar mal.
+RUBRO_UTIL = re.compile(
+    r"construc|edificac|ingenier|arquitect|\bobras?\b|urbaniz|hormig|cemento|asfalt|pavimen|ferreter|"
+    r"tuberi|sanitari|electric|iluminac|alumbrado|maquinaria|excavac|cantera|aridos|madera|estructur|"
+    r"topograf|geolog|pintura|aislante|techumbre|ventana|puerta|cerradura|griferi|ladrillo|vidrio|"
+    r"agua potable|riego|herramienta|andamio|grua|equipo de (?:construccion|movimiento)|material(?:es)? de"
+)
+
+
+SENAL_DEBIL = {"ruta", "carretera"}
+
+
+def rubros_utiles(rubros):
+    return [r for r in (rubros or []) if RUBRO_UTIL.search(normalizar(r))]
+
+
 def motivo_afin(nombre: str, rubros, sector: str, descripcion: str = ""):
     """Por qué una licitación se considera de construcción (o None si no lo es):
-    'nombre' (frases de obra, materiales, maquinaria o estudios en el nombre o rubro),
+    'nombre' (frases de obra, materiales, maquinaria o estudios en el nombre o en rubros de construcción),
     'organismo' (MOP y similares), 'descripcion' (al menos dos señales distintas en la descripción)."""
-    t_nom = normalizar(f"{nombre} {' '.join(rubros or [])}")
+    t_solo_nombre = normalizar(nombre)
+    t_nom = normalizar(f"{nombre} {' '.join(rubros_utiles(rubros))}")
+    # Si el nombre habla de transporte, aseo, insumos, etc., solo cuenta como construcción si además
+    # trae una señal clara de obra, material, maquinaria o estudio (no basta «ruta» o «carretera»,
+    # que también aparecen en servicios de transporte). Los rubros y la descripción no lo rescatan.
+    if NO_OBRA.search(t_solo_nombre):
+        if (_senales(t_solo_nombre) - SENAL_DEBIL) or _material(t_solo_nombre):
+            return "nombre"
+        return None
+    if _senales(t_solo_nombre) or _material(t_solo_nombre):
+        return "nombre"
     if _senales(t_nom) or _material(t_nom):
         return "nombre"
-    t_solo_nombre = normalizar(nombre)
-    if INICIO_OBRA.match(t_solo_nombre) and not NO_OBRA.search(t_nom) and not NO_INICIO_OBRA.search(t_nom):
+    if INICIO_OBRA.match(t_solo_nombre) and not NO_INICIO_OBRA.search(t_nom):
         return "nombre"
-    if NO_OBRA.search(t_nom):
-        return None
     if sector in SECTORES_AFIN:
         return "organismo"
     if descripcion and len(_senales(normalizar(descripcion))) >= 2:
@@ -233,7 +258,7 @@ def es_afin_texto(nombre: str, rubros, sector: str, descripcion: str = "") -> bo
 
 def linea_de(nombre: str, rubros) -> str:
     """Línea de negocio de una licitación de construcción: obras, materiales, maquinaria o estudios."""
-    t = normalizar(f"{nombre} {' '.join(rubros or [])}")
+    t = normalizar(f"{nombre} {' '.join(rubros_utiles(rubros))}")
     if ESTUDIOS.search(t):
         return LINEAS[3]
     obra = AFIN_FUERTE.search(t) or AFIN_OBRA.search(t) or AFIN_MANT.search(t)
