@@ -22,6 +22,16 @@ a{color:var(--azul)}
 .cab{background:var(--azul-osc);color:#fff;border-bottom:4px solid var(--naranja)}
 .cab-in{max-width:1280px;margin:0 auto;padding:22px 20px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
 .cab h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.marca{display:flex;align-items:center;gap:16px}
+.logo{background:#fff;border-radius:10px;padding:8px 12px;display:flex;align-items:center;flex:none}
+.logo img{display:block;height:68px;width:auto;max-width:220px}
+.ic{width:1.2em;height:1.2em;vertical-align:-.22em;margin-right:7px;flex:none}
+.panel h2 .ic{color:var(--naranja)}
+.kpi .et .ic,.dcard .et .ic,.cmp .et .ic{color:var(--azul);margin-right:6px}
+.kpi.alerta .et .ic,.dcard.o .et .ic,.acard.urg .ttl .ic{color:var(--naranja)}
+.acard .ttl .ic{color:var(--azul)}
+.acard.nva .ttl .ic{color:var(--azul-osc)}
+.seg .ic{margin-right:8px;opacity:1}
 .cab .sub{margin:4px 0 0;font-size:14px;color:#C9DCF0}
 .cab .meta{text-align:right;font-size:13px;color:#C9DCF0}
 .cab .meta strong{color:#fff;font-size:15px;display:block}
@@ -54,6 +64,7 @@ main{max-width:1280px;margin:0 auto;padding:20px}
 .seg[aria-pressed="true"]{background:var(--azul-osc);color:#fff;box-shadow:inset 0 -4px 0 var(--naranja)}
 .seg:focus-visible{outline:3px solid var(--azul);outline-offset:2px;position:relative}
 .seg span{font-weight:400;opacity:.85;margin-left:4px}
+@media(max-width:520px){.logo img{height:48px;max-width:150px}.marca{gap:12px}}
 @media(max-width:620px){.seg{flex-basis:100%}.seg+.seg{margin-left:0;margin-top:-2px}.seg:first-child{border-radius:var(--radio) var(--radio) 0 0}.seg:last-child{border-radius:0 0 var(--radio) var(--radio)}}
 .chk{gap:8px;align-items:center;font-size:14px;font-weight:600;color:var(--azul-osc);cursor:pointer}
 .chk input{width:18px;height:18px;margin:0;accent-color:var(--azul)}
@@ -120,16 +131,81 @@ td .uni{display:block;font-size:12.5px;color:var(--texto-2)}
 td .min{display:block;font-size:12px;color:var(--texto-2)}
 .etq{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;background:var(--azul-t);color:var(--azul-osc);margin:3px 4px 0 0}
 .etq.nueva{background:var(--azul-osc);color:#fff}
+.etq.lin{background:var(--gris-t);color:var(--azul-osc);border:1px solid var(--gris)}
 td.monto{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
 .sinmonto{color:var(--texto-2)}
 .pag{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;font-size:13px;color:var(--texto-2)}
 .pag button{padding:6px 12px;border-radius:8px;border:1px solid var(--azul);background:#fff;color:var(--azul);font:inherit;font-weight:600;cursor:pointer}
 .pag button:disabled{border-color:var(--gris);color:#8A949E;cursor:not-allowed}
+.lnk{all:unset;cursor:pointer;color:var(--azul);font-weight:600;text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.lnk:hover{color:var(--azul-osc)}
+.lnk:focus-visible{outline:3px solid var(--azul);outline-offset:2px;border-radius:3px}
+.dest,.alertas{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.dcard,.acard{border:1px solid var(--borde);border-radius:var(--radio);padding:12px 14px;min-width:0;background:#fff;display:flex;flex-direction:column;gap:5px}
+.dcard{border-left:5px solid var(--azul)}
+.dcard.o{border-left-color:var(--naranja)}
+.dcard .et{font-size:12px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.dcard .gr{font-size:24px;font-weight:700;color:var(--azul-osc);line-height:1.2;font-variant-numeric:tabular-nums}
+.dcard .sub{font-size:12.5px;color:var(--texto-2);overflow-wrap:anywhere}
+.dcard .btn{align-self:flex-start;margin-top:auto}
+.acard{border-top:5px solid var(--azul)}
+.acard.urg{border-top-color:var(--naranja)}
+.acard.nva{border-top-color:var(--azul-osc)}
+.acard.act{box-shadow:0 0 0 2px var(--azul)}
+.acard .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.acard .ttl{font-size:14.5px;font-weight:700;color:var(--azul-osc)}
+.acard .cnt{font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--azul-osc)}
+.acard.urg .cnt{color:var(--naranja-txt)}
+.acard .def{font-size:12.5px;color:var(--texto-2)}
+.acard ul{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.acard li{font-size:13px;border-top:1px solid #E6E8EB;padding-top:6px}
+.acard li small{display:block;font-size:12px;color:var(--texto-2)}
+.acard .btn{align-self:flex-start;margin-top:auto}
+.comp{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.cmp{border:1px solid var(--borde);border-radius:var(--radio);padding:12px 14px;background:#fff;min-width:0}
+.cmp .et{font-size:12px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+.cmp .val{font-size:22px;font-weight:700;color:var(--azul-osc);font-variant-numeric:tabular-nums;margin-top:2px}
+.cmp .ant{font-size:12.5px;color:var(--texto-2)}
+.cmp .var{display:inline-block;margin-top:4px;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--azul-t);color:var(--azul-osc)}
+.cmp .var.baja{background:var(--naranja-t);color:var(--naranja-txt)}
+.cmp .var.ref{background:var(--gris-t);color:var(--texto-2);font-weight:600}
+.evo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.evo .c{border:1px solid var(--borde);border-radius:var(--radio);padding:12px 14px;min-width:0}
+.evo h3{margin:0 0 4px;font-size:14px;color:var(--azul-osc)}
+.evo svg{display:block;width:100%;height:auto;overflow:visible}
+.evo .ax{stroke:#E1E4E8;stroke-width:1}
+.evo text{font-size:11.5px;fill:var(--texto-2);font-family:inherit}
+.evo text.vl{fill:var(--texto);font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.evo-nota{font-size:12.5px;color:var(--texto-2);margin:10px 0 0}
+.evo-nota.aviso-h{background:var(--naranja-t);border:1px solid var(--naranja);color:var(--naranja-txt);border-radius:8px;padding:8px 12px}
+details.datos{margin-top:10px;font-size:13px}
+details.datos summary{cursor:pointer;font-weight:600;color:var(--azul)}
+table.mini{min-width:0;table-layout:auto;width:auto;margin-top:8px}
+table.mini th,table.mini td{padding:6px 12px;font-size:13px}
+table.mini td.num{text-align:right;font-variant-numeric:tabular-nums}
+dialog#ficha{border:0;border-radius:12px;padding:0;width:min(780px,calc(100% - 24px));max-height:calc(100vh - 24px);color:var(--texto);background:#fff;box-shadow:0 12px 44px rgba(0,0,0,.4);overflow:hidden}
+dialog#ficha[open]{display:flex;flex-direction:column}
+dialog#ficha::backdrop{background:rgba(0,61,107,.6)}
+.fi-cab{background:var(--azul-osc);color:#fff;padding:14px 18px;border-bottom:4px solid var(--naranja);display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+.fi-cab h2{margin:2px 0 0;font-size:18px;line-height:1.3;color:#fff}
+.fi-cod{font-size:13px;color:#C9DCF0;font-weight:600}
+.fi-x{all:unset;cursor:pointer;color:#fff;font-size:20px;line-height:1;padding:6px 10px;border-radius:6px}
+.fi-x:hover{background:rgba(255,255,255,.18)}
+.fi-x:focus-visible{outline:3px solid #fff;outline-offset:1px}
+.fi-cuerpo{padding:16px 18px;overflow:auto}
+dl.fi{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin:0}
+dl.fi dt{font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--texto-2);font-weight:700}
+dl.fi dd{margin:2px 0 0;font-weight:600;overflow-wrap:anywhere}
+dl.fi dd .uni{font-weight:400}
+dl.fi .full{grid-column:1/-1}
+dl.fi dd.desc{font-weight:400;white-space:pre-line;max-height:240px;overflow:auto;border:1px solid #E6E8EB;border-radius:8px;padding:8px 10px;background:var(--gris-t)}
+.fi-pie{padding:12px 18px;border-top:1px solid var(--borde);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;background:#fff}
 .estado{padding:36px 16px;text-align:center;color:var(--texto-2)}
 .estado strong{display:block;color:var(--azul-osc);font-size:16px;margin-bottom:4px}
 footer{max-width:1280px;margin:0 auto;padding:6px 20px 32px;font-size:12.5px;color:var(--texto-2)}
 footer p{margin:4px 0}
 @media (max-width:1000px){
+  .dest,.alertas,.evo,.comp{grid-template-columns:1fr}
   .graficos{grid-template-columns:1fr}
   .filtros{grid-template-columns:1fr 1fr}
   .filtros .busca{grid-column:1/-1}
@@ -151,19 +227,50 @@ footer p{margin:4px 0}
   td.dias::before{display:none}
   td .desc{max-width:none}
   colgroup{display:none}
+  table.mini{display:table;width:100%}
+  table.mini thead{display:table-header-group;position:static}
+  table.mini tbody{display:table-row-group}
+  table.mini tr{display:table-row;border:0;margin:0;padding:0;background:none}
+  table.mini th,table.mini td{display:table-cell;padding:6px 8px;border-bottom:1px solid #E6E8EB}
+  table.mini td::before{display:none}
+  dl.fi{grid-template-columns:1fr}
+  .acard .cnt{font-size:26px}
 }
 @media print{
-  .filtros,.pag,.btn,#mapa,.leyenda{display:none!important}
+  .filtros,.pag,.btn,#mapa,.leyenda,dialog{display:none!important}
   body{background:#fff}
 }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></g></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 0 0 4 0"/></g></symbol>
+<symbol id="i-hat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16a7 7 0 0 1 14 0"/><path d="M3 16h18v3H3z"/><path d="M12 9v4"/></g></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.8 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5"/><path d="M12 6v2M12 16v2"/></g></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></g></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></g></symbol>
+<symbol id="i-org" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></g></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></g></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></g></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></g></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></g></symbol>
+<symbol id="i-bars" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V10M12 20V4M19 20v-7"/></g></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></g></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5"/><path d="M5 20h14"/></g></symbol>
+<symbol id="i-bulb" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></g></symbol>
+</defs>
+</svg>
 <header class="cab">
   <div class="cab-in">
-    <div>
-      <h1>Licitaciones activas · Región de O'Higgins</h1>
-      <p class="sub">Cámara Chilena de la Construcción · Sede Región de O'Higgins · Estudios</p>
+    <div class="marca">
+      <span class="logo"><img src="logo-cchc.png" alt="Cámara Chilena de la Construcción" onerror="this.parentNode.style.display='none'"></span>
+      <div>
+        <h1>Licitaciones activas · Región de O'Higgins</h1>
+        <p class="sub">Cámara Chilena de la Construcción · Sede Región de O'Higgins · Estudios</p>
+      </div>
     </div>
     <div class="meta">
       <strong id="actualizado">Cargando datos…</strong>
@@ -177,11 +284,23 @@ footer p{margin:4px 0}
 
   <section class="kpis" id="kpis" aria-label="Indicadores"></section>
 
+  <section class="panel" aria-label="Oportunidades destacadas">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Oportunidades destacadas</h2>
+    <p class="nota">Calculadas sobre las licitaciones que muestran los filtros actuales. Los montos se comparan solo en pesos (CLP) y solo entre licitaciones que lo informan.</p>
+    <div class="dest" id="dest-in"></div>
+  </section>
+
+  <section class="panel" aria-label="Alertas de oportunidades">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg>Alertas de oportunidades</h2>
+    <p class="nota">Haga clic en el número o en «Ver en el listado» para filtrar la tabla. Respetan los demás filtros activos.</p>
+    <div class="alertas" id="alertas-in"></div>
+  </section>
+
   <section class="panel" aria-label="Filtros">
-    <h2>Filtros</h2>
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-filter"/></svg>Filtros</h2>
     <div class="alcance" role="group" aria-label="Alcance del análisis">
-      <button type="button" class="seg" id="seg-cons" data-alc="1" aria-pressed="true">Construcción e infraestructura <span id="n-cons"></span></button>
-      <button type="button" class="seg" id="seg-todas" data-alc="0" aria-pressed="false">Todas las licitaciones <span id="n-todas"></span></button>
+      <button type="button" class="seg" id="seg-cons" data-alc="1" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-hat"/></svg>Construcción e infraestructura <span id="n-cons"></span></button>
+      <button type="button" class="seg" id="seg-todas" data-alc="0" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg>Todas las licitaciones <span id="n-todas"></span></button>
     </div>
     <div class="filtros">
       <div class="busca">
@@ -194,12 +313,13 @@ footer p{margin:4px 0}
       <div><label for="f-tramo">Días restantes</label><select id="f-tramo"></select></div>
       <div><label for="f-monto">Monto estimado</label><select id="f-monto"></select></div>
       <div><label for="f-tipo">Tipo de licitación</label><select id="f-tipo"></select></div>
+      <div><label for="f-linea">Línea de negocio</label><select id="f-linea"></select></div>
       <div><label for="f-rubro">Rubro</label><select id="f-rubro"></select></div>
       <div class="fila2">
-        <label class="chk"><input type="checkbox" id="f-nueva"> Solo nuevas (últimos 2 días)</label>
+        <label class="chk"><input type="checkbox" id="f-nueva"> Solo nuevas (últimas 48 horas)</label>
         <span class="esp"></span>
         <button class="btn" type="button" id="limpiar">Limpiar filtros</button>
-        <button class="btn pri" type="button" id="exportar">Descargar CSV</button>
+        <button class="btn pri" type="button" id="exportar"><svg class="ic" aria-hidden="true"><use href="#i-down"/></svg>Descargar CSV</button>
       </div>
     </div>
   </section>
@@ -207,7 +327,7 @@ footer p{margin:4px 0}
   <section class="panel" aria-label="Mapa por comuna">
     <div class="mapa-cab">
       <div>
-        <h2>Mapa de licitaciones por comuna</h2>
+        <h2><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Mapa de licitaciones por comuna</h2>
         <p class="nota">Cada círculo agrupa las licitaciones de una comuna según los filtros activos. Haga clic para ver el detalle.</p>
       </div>
       <button class="btn" type="button" id="centrar">Ver toda la región</button>
@@ -220,8 +340,30 @@ footer p{margin:4px 0}
     </div>
   </section>
 
+  <section class="panel" aria-label="Listado de licitaciones" id="tabla-sec">
+    <div class="tabla-cab">
+      <h2><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg>Licitaciones vigentes</h2>
+      <span class="cuenta" id="cuenta" aria-live="polite"></span>
+    </div>
+    <div class="scroll">
+      <table>
+        <caption style="position:absolute;left:-9999px">Licitaciones vigentes en la Región de O'Higgins</caption>
+        <colgroup>
+          <col style="width:10%"><col style="width:13%"><col style="width:21%"><col style="width:16%">
+          <col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:10%">
+        </colgroup>
+        <thead><tr id="cabecera"></tr></thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </div>
+    <div id="estado"></div>
+    <div class="pag" id="pag"></div>
+  </section>
+
   <section class="graficos" aria-label="Resumen gráfico">
+    <div class="panel" style="grid-column:1/-1;margin:0"><h2><svg class="ic" aria-hidden="true"><use href="#i-bars"/></svg>Resumen gráfico</h2><p class="nota" style="margin:0">Cada barra es clicable: filtra todo el panel.</p></div>
     <div class="panel"><h2>Por plazo de cierre</h2><p class="nota">Licitaciones según días que faltan.</p><div class="barras" id="g-plazo"></div></div>
+    <div class="panel"><h2>Por línea de negocio</h2><p class="nota">Obras, materiales, maquinaria y estudios (solo construcción e infraestructura).</p><div class="barras" id="g-linea"></div></div>
     <div class="panel"><h2>Por tipo de licitación</h2><p class="nota">Tramo en UTM; sirve cuando el monto no se publica.</p><div class="barras" id="g-tipo"></div></div>
     <div class="panel"><h2>Por tramo de monto (CLP)</h2><p class="nota">Muchas licitaciones no publican monto estimado.</p><div class="barras" id="g-monto"></div></div>
     <div class="panel"><h2>Por sector</h2><p class="nota">Número de licitaciones.</p><div class="barras" id="g-sector"></div></div>
@@ -232,30 +374,28 @@ footer p{margin:4px 0}
     <div class="panel"><h2>Rubros (top 8)</h2><p class="nota">Según la clasificación de Mercado Público.</p><div class="barras" id="g-rubro"></div></div>
   </section>
 
-  <section class="panel" aria-label="Listado de licitaciones">
-    <div class="tabla-cab">
-      <h2>Licitaciones vigentes</h2>
-      <span class="cuenta" id="cuenta" aria-live="polite"></span>
-    </div>
-    <div class="scroll">
-      <table>
-        <caption style="position:absolute;left:-9999px">Licitaciones vigentes en la Región de O'Higgins</caption>
-        <colgroup>
-          <col style="width:10%"><col style="width:11%"><col style="width:22%"><col style="width:17%">
-          <col style="width:8%"><col style="width:11%"><col style="width:11%"><col style="width:10%">
-        </colgroup>
-        <thead><tr id="cabecera"></tr></thead>
-        <tbody id="cuerpo"></tbody>
-      </table>
-    </div>
-    <div id="estado"></div>
-    <div class="pag" id="pag"></div>
+  <section class="panel" aria-label="Evolución mensual de las licitaciones" id="evo-sec">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-trend"/></svg>Evolución mensual de las licitaciones</h2>
+    <p class="nota" id="evo-alcance"></p>
+    <div id="evo-in"></div>
   </section>
 </main>
 
+<dialog id="ficha" aria-labelledby="ficha-t">
+  <div class="fi-cab">
+    <div><div class="fi-cod" id="ficha-cod"></div><h2 id="ficha-t"></h2></div>
+    <button type="button" class="fi-x" id="ficha-x" aria-label="Cerrar ficha">✕</button>
+  </div>
+  <div class="fi-cuerpo" id="ficha-in"></div>
+  <div class="fi-pie">
+    <a class="btn pri" id="ficha-mp" href="#" target="_blank" rel="noopener noreferrer">Ver en Mercado Público ↗</a>
+    <button type="button" class="btn" id="ficha-c">Cerrar</button>
+  </div>
+</dialog>
+
 <footer>
   <p id="pie-datos"></p>
-  <p><strong>Fuente:</strong> Dirección ChileCompra, API de Mercado Público (api.mercadopublico.cl). Los campos «Sector», «Rubro afín a construcción», «Nueva», la ubicación en el mapa (centro referencial de cada comuna) y los días restantes son cálculos referenciales de la CChC O'Higgins, no datos oficiales de ChileCompra.</p>
+  <p><strong>Fuente:</strong> Dirección ChileCompra, API de Mercado Público (api.mercadopublico.cl). Los campos «Sector», «Afín a construcción», «Línea de negocio», las alertas («Urgente», «Próxima», «Nueva»), la evolución mensual, la ubicación en el mapa (centro referencial de cada comuna) y los días restantes son cálculos referenciales de la CChC O'Higgins, no datos oficiales de ChileCompra.</p>
   <p>Mapa: © colaboradores de OpenStreetMap. Biblioteca Leaflet. Antes de decidir, revise siempre las bases, los plazos y las eventuales modificaciones en la ficha oficial de cada licitación en Mercado Público.</p>
 </footer>
 
@@ -306,7 +446,9 @@ function tramoMonto(l){
 var ORDEN_TIPOS=['L1','LE','LP','LQ','LR','LS'];
 
 var filas=[], datos=null;
-var F0={q:'',sector:'',organismo:'',comuna:'',tramo:'',monto:'',tipo:'',rubro:'',afin:true,nueva:false};
+var F0={q:'',sector:'',organismo:'',comuna:'',tramo:'',monto:'',tipo:'',rubro:'',linea:'',afin:true,nueva:false,alerta:''};
+var porId={};
+var LINEAS=['Obras','Materiales y suministros','Maquinaria y equipos','Estudios y servicios técnicos'];
 var F=Object.assign({},F0);
 var orden={col:'dias',dir:1}, pagina=1;
 
@@ -322,10 +464,12 @@ function prepararFilas(lics){
     if(ms!=null && ms<ahora) return;               // ya cerró desde la última actualización
     var dias=ms==null?9999:Math.round((Math.floor(ms/DIA)*DIA-hoy0)/DIA);
     var rubros=l.rubros||[], comuna=comunaCanon(l.comuna);
-    var v=l.visto?Date.parse(l.visto+'T00:00:00Z'):null;
+    var v=l.visto?Date.parse(l.visto+'T00:00:00Z'):null, pub=aMs(l.publicacion);
+    // «Nueva»: publicada en las últimas 48 horas (si no hay fecha de publicación, se usa la fecha en que el panel la vio por primera vez)
+    var nueva=pub!=null ? ((ahora-pub)<=2*DIA && pub<=ahora+36e5) : (v!=null && (hoy0-v)<=2*DIA);
     out.push({
       l:l,ms:ms==null?Infinity:ms,dias:dias,tramo:tramo(dias),mt:tramoMonto(l),comuna:comuna,rubro:rubros[0]||'',
-      nueva:v!=null && (hoy0-v)<=2*DIA,
+      nueva:nueva,pub:pub!=null?pub:(v!=null?v:0),
       texto:norm([l.id,l.nombre,l.descripcion,l.organismo,l.unidad,comuna,l.sector,rubros.join(' ')].join(' '))
     });
   });
@@ -341,9 +485,14 @@ function pasa(f,omitir){
   if(omitir!=='tramo' && F.tramo && f.tramo!==F.tramo)return false;
   if(omitir!=='monto' && F.monto && f.mt!==F.monto)return false;
   if(omitir!=='tipo' && F.tipo && l.tipo!==F.tipo)return false;
+  if(omitir!=='linea' && F.linea && l.linea!==F.linea)return false;
   if(omitir!=='rubro' && F.rubro && (l.rubros||[]).indexOf(F.rubro)<0)return false;
   if(F.afin && !l.afin)return false;
-  if(F.nueva && !f.nueva)return false;
+  if(omitir!=='alerta'){
+    if(F.nueva && !f.nueva)return false;
+    if(F.alerta==='urg' && f.dias>1)return false;
+    if(F.alerta==='prox' && (f.dias<2||f.dias>3))return false;
+  }
   return true;
 }
 function filtradas(omitir){return filas.filter(function(f){return pasa(f,omitir);});}
@@ -386,6 +535,8 @@ function prepararFiltros(){
   llenarSelect('#f-comuna','Todas las comunas',ordenar(c).map(function(k){return [k,k+' ('+c[k]+')'];}));
   llenarSelect('#f-tipo','Todos los tipos',ordenar(t).map(function(k){
     var n=(filas.filter(function(f){return f.l.tipo===k;})[0]||{l:{}}).l.tipo_nombre||k;return [k,k+' · '+n+' ('+t[k]+')'];}));
+  var li=contar(filas,function(f){return f.l.linea;});
+  llenarSelect('#f-linea','Todas las líneas',LINEAS.filter(function(k){return li[k];}).map(function(k){return [k,k+' ('+li[k]+')'];}));
   llenarSelect('#f-rubro','Todos los rubros',ordenar(r).map(function(k){return [k,k+' ('+r[k]+')'];}));
   var tc=contar(filas,function(f){return f.tramo;});
   llenarSelect('#f-tramo','Cualquier plazo',TRAMOS.map(function(x){return [x[0],x[1]+' ('+(tc[x[0]]||0)+')'];}));
@@ -402,14 +553,197 @@ function kpis(arr){
   var clp=arr.filter(function(f){return esCLP(f.l);});
   var suma=clp.reduce(function(a,f){return a+f.l.monto;},0);
   var med=mediana(clp.map(function(f){return f.l.monto;}));
-  var mayor=clp.reduce(function(a,f){return (!a||f.l.monto>a.l.monto)?f:a;},null);
+  var ncom=Object.keys(contar(arr,function(f){return f.comuna;})).length;
   $('#kpis').innerHTML=
-    '<div class="kpi"><div class="et">Licitaciones vigentes</div><div class="val">'+nf.format(n)+'</div><div class="det">'+(n===total?'Toda la región':'de '+nf.format(total)+' en la región')+'</div></div>'+
-    '<div class="kpi alerta"><div class="et">Cierran en 7 días o menos</div><div class="val">'+nf.format(urg)+'</div><div class="det">Requieren decisión pronta</div></div>'+
-    '<div class="kpi"><div class="et">Nuevas (últimos 2 días)</div><div class="val">'+nf.format(nuevas)+'</div><div class="det">Aparecieron desde la última revisión</div></div>'+
-    '<div class="kpi"><div class="et">Afines a construcción</div><div class="val">'+nf.format(afin)+'</div><div class="det">Clasificación referencial</div></div>'+
-    '<div class="kpi"><div class="et">Monto informado (CLP)</div><div class="val">'+(clp.length?fmtMM(suma):'—')+'</div><div class="det">'+(clp.length?'Mediana '+fmtMM(med)+' · ':'')+nf.format(clp.length)+' de '+nf.format(n)+' con monto</div></div>'+
-    '<div class="kpi"><div class="et">Mayor monto informado</div><div class="val">'+(mayor?fmtMM(mayor.l.monto):'—')+'</div><div class="det">'+(mayor?esc(mayor.l.organismo):'Sin montos en CLP')+'</div></div>';
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Licitaciones vigentes</div><div class="val">'+nf.format(n)+'</div><div class="det">'+(n===total?'Toda la región':'de '+nf.format(total)+' en la región')+'</div></div>'+
+    '<div class="kpi alerta"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Cierran en 7 días o menos</div><div class="val">'+nf.format(urg)+'</div><div class="det">Requieren decisión pronta</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg>Nuevas (últimas 48 horas)</div><div class="val">'+nf.format(nuevas)+'</div><div class="det">Publicadas en los últimos 2 días</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-hat"/></svg>Afines a construcción</div><div class="val">'+nf.format(afin)+'</div><div class="det">Clasificación referencial</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-coin"/></svg>Monto informado (CLP)</div><div class="val">'+(clp.length?fmtMM(suma):'—')+'</div><div class="det">'+(clp.length?'Mediana '+fmtMM(med)+' · ':'')+nf.format(clp.length)+' de '+nf.format(n)+' con monto</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Comunas con licitaciones</div><div class="val">'+nf.format(ncom)+'</div><div class="det">de '+COMUNAS.length+' comunas de la región</div></div>';
+}
+
+/* ---- Oportunidades destacadas ---- */
+function textoPlazo(f){
+  if(f.ms===Infinity)return 'sin fecha de cierre';
+  if(f.dias===0)return 'cierra hoy '+(f.l.cierre||'').slice(11,16);
+  if(f.dias===1)return 'cierra mañana';
+  return 'cierra en '+f.dias+' días';
+}
+function botonFiltro(tp,k){
+  var on=(F[tp]===k);
+  return '<button type="button" class="btn sm" data-filtra="'+tp+'" data-k="'+esc(k)+'" aria-pressed="'+(on?'true':'false')+'">'+(on?'Quitar este filtro':'Filtrar por '+(tp==='organismo'?'este organismo':'esta comuna'))+'</button>';
+}
+function destacadas(arr){
+  var el=$('#dest-in');
+  if(!arr.length){el.innerHTML='<div class="vacio-g">Sin licitaciones con los filtros actuales.</div>';return;}
+  var clp=arr.filter(function(f){return esCLP(f.l);}), h='';
+  var may=clp.reduce(function(a,f){return (!a||f.l.monto>a.l.monto)?f:a;},null);
+  if(may){
+    h+='<div class="dcard o"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Mayor licitación disponible</div><div class="gr">'+fmtMM(may.l.monto)+'</div>'+
+      '<button type="button" class="lnk" data-ficha="'+esc(may.l.id)+'">'+esc(may.l.nombre)+'</button>'+
+      '<div class="sub">'+esc(may.l.organismo)+(may.comuna?' · '+esc(may.comuna):'')+'</div>'+
+      '<div class="sub">'+esc(may.l.id)+' · '+esc(textoPlazo(may))+'</div></div>';
+  } else h+='<div class="dcard o"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Mayor licitación disponible</div><div class="gr">—</div><div class="sub">Ninguna de las licitaciones filtradas informa monto en pesos.</div></div>';
+  var m=sumar(arr,function(f){return f.l.organismo;}), o=ordenar(m)[0];
+  if(o){
+    var no=arr.filter(function(f){return f.l.organismo===o;}), nm=no.filter(function(f){return esCLP(f.l);}).length;
+    h+='<div class="dcard"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-org"/></svg>Organismo con mayor monto licitado</div><div class="gr">'+fmtMM(m[o])+'</div>'+
+      '<div><strong>'+esc(o)+'</strong></div>'+
+      '<div class="sub">'+nf.format(no.length)+' licitaci'+(no.length===1?'ón':'ones')+' vigentes ('+nf.format(nm)+' con monto informado)</div>'+botonFiltro('organismo',o)+'</div>';
+  } else h+='<div class="dcard"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-org"/></svg>Organismo con mayor monto licitado</div><div class="gr">—</div><div class="sub">Sin montos en pesos informados.</div></div>';
+  var c=contar(arr,function(f){return f.comuna;}), mc=sumar(arr,function(f){return f.comuna;});
+  var ck=Object.keys(c).sort(function(a,b){return c[b]-c[a]||(mc[b]||0)-(mc[a]||0)||a.localeCompare(b,'es');})[0];
+  if(ck){
+    h+='<div class="dcard"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Comuna con más licitaciones</div><div class="gr">'+esc(ck)+'</div>'+
+      '<div class="sub"><strong>'+nf.format(c[ck])+'</strong> licitaci'+(c[ck]===1?'ón':'ones')+(mc[ck]?' · monto informado '+fmtMM(mc[ck]):' · sin monto informado')+'</div>'+botonFiltro('comuna',ck)+'</div>';
+  } else h+='<div class="dcard"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg>Comuna con más licitaciones</div><div class="gr">—</div><div class="sub">Sin comuna reconocible.</div></div>';
+  el.innerHTML=h;
+}
+
+/* ---- Alertas de oportunidades ---- */
+function alertas(){
+  var base=filas.filter(function(f){return pasa(f,'alerta');});
+  var porCierre=function(a,b){return a.ms===b.ms?0:(a.ms<b.ms?-1:1);};
+  var urg=base.filter(function(f){return f.dias<=1;}).sort(porCierre);
+  var prox=base.filter(function(f){return f.dias>=2&&f.dias<=3;}).sort(porCierre);
+  var nva=base.filter(function(f){return f.nueva;}).sort(function(a,b){return b.pub-a.pub;});
+  function tarjeta(cls,clave,titulo,ico,def,lista,activo,detalle){
+    var li=lista.slice(0,3).map(function(f){
+      return '<li><button type="button" class="lnk" data-ficha="'+esc(f.l.id)+'">'+esc(String(f.l.nombre).slice(0,90))+'</button>'+
+        '<small>'+esc(f.l.organismo)+(f.comuna?' · '+esc(f.comuna):'')+' · '+esc(detalle(f))+'</small></li>';
+    }).join('');
+    return '<div class="acard '+cls+(activo?' act':'')+'">'+
+      '<div class="top"><span class="ttl">'+ico+titulo+'</span><span class="cnt">'+nf.format(lista.length)+'</span></div>'+
+      '<div class="def">'+def+'</div>'+
+      (lista.length?'<ul>'+li+'</ul>'+(lista.length>3?'<div class="def">y '+(lista.length-3)+' más…</div>':'')+
+        '<button type="button" class="btn sm" data-alerta="'+clave+'" aria-pressed="'+(activo?'true':'false')+'">'+(activo?'Quitar filtro':'Ver en el listado')+'</button>':
+        '<div class="def">Ninguna con los filtros actuales.</div>')+
+      '</div>';
+  }
+  $('#alertas-in').innerHTML=
+    tarjeta('urg','urg','Urgente','<svg class="ic" aria-hidden="true"><use href="#i-warn"/></svg>','Cierran hoy o mañana',urg,F.alerta==='urg',function(f){return textoPlazo(f);})+
+    tarjeta('prox','prox','Próximas','<svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>','Cierran en 2 a 3 días',prox,F.alerta==='prox',function(f){return textoPlazo(f);})+
+    tarjeta('nva','nueva','Nuevas','<svg class="ic" aria-hidden="true"><use href="#i-bell"/></svg>','Publicadas en las últimas 48 horas',nva,F.nueva,function(f){return 'publicada '+fmtFecha(f.l.publicacion||'').slice(0,10);});
+}
+
+/* ---- Evolución mensual ---- */
+var MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+function mesTxt(k){return MESES[+k.slice(5,7)-1]+' '+k.slice(2,4);}
+function dstr(ms){return new Date(ms).toISOString().slice(0,10);}
+function fmtDia(s){return s?s.slice(8,10)+'-'+s.slice(5,7)+'-'+s.slice(0,4):'—';}
+function nice(x){var p=Math.pow(10,Math.floor(Math.log(x)/Math.LN10)),f=x/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p;}
+function numMM(v){return nf.format(v>=100?Math.round(v):Math.round(v*10)/10);}
+function lineas(el,et,val,o){
+  var W=Math.max(300,Math.round(el.clientWidth||520)),H=230,pl=48,pr=18,pt=24,pb=32,n=val.length;
+  var max=Math.max.apply(null,val.concat([0])), paso=nice((max||1)/4);
+  if(o.entero)paso=Math.max(1,paso);
+  var tope=paso*Math.ceil((max||1)/paso), iw=W-pl-pr, ih=H-pt-pb, i;
+  function X(k){return n===1?pl+iw/2:pl+k*iw/(n-1);}
+  function Y(v){return pt+ih-(v/tope)*ih;}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.aria)+'">';
+  for(var g=0;g<=Math.round(tope/paso);g++){
+    var vv=g*paso, y=Y(vv).toFixed(1);
+    s+='<line class="ax" x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'"/><text x="'+(pl-6)+'" y="'+(+y+4)+'" text-anchor="end">'+o.fmtEje(vv)+'</text>';
+  }
+  var last=n-1, fin=(o.parcial&&n>1)?last-1:last, p=[];
+  for(i=0;i<=fin;i++)p.push(X(i).toFixed(1)+','+Y(val[i]).toFixed(1));
+  if(p.length>1)s+='<polyline fill="none" stroke="'+o.color+'" stroke-width="2.5" stroke-linejoin="round" points="'+p.join(' ')+'"/>';
+  if(o.parcial&&n>1)s+='<line x1="'+X(last-1).toFixed(1)+'" y1="'+Y(val[last-1]).toFixed(1)+'" x2="'+X(last).toFixed(1)+'" y2="'+Y(val[last]).toFixed(1)+'" stroke="'+o.color+'" stroke-width="2.5" stroke-dasharray="5 4"/>';
+  var sp=n>1?iw/(n-1):iw, cada=Math.max(1,Math.ceil(54/sp));
+  for(i=0;i<n;i++){
+    var cx=X(i).toFixed(1), cy=Y(val[i]).toFixed(1), enCurso=(o.parcial&&i===last);
+    s+='<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="'+(enCurso?'#fff':o.color)+'" stroke="'+o.color+'" stroke-width="2"><title>'+esc(et[i]+(enCurso?' (mes en curso, incompleto)':'')+': '+o.fmtVal(val[i]))+'</title></circle>';
+    if(sp>=34||i===last)s+='<text class="vl" x="'+cx+'" y="'+(+cy-9)+'" text-anchor="middle">'+o.fmtEje(val[i])+'</text>';
+    if((last-i)%cada===0)s+='<text x="'+cx+'" y="'+(H-10)+'" text-anchor="middle">'+esc(et[i])+(enCurso?'*':'')+'</text>';
+  }
+  el.innerHTML=s+'</svg>';
+}
+var EVO=null;
+function evolucion(){
+  var h=(datos&&datos.historial)||[], el=$('#evo-in');
+  $('#evo-alcance').textContent='Licitaciones de la región agrupadas por mes de publicación. Alcance actual: '+(F.afin?'construcción e infraestructura':'todas las licitaciones')+' (cambie el selector de arriba para ver el otro).';
+  var hs=h.filter(function(r){return !F.afin||r[2]===1;});
+  if(!hs.length){el.innerHTML='<div class="vacio-g">Aún no hay historial acumulado. Se irá completando con cada actualización automática.</div>';EVO=null;return;}
+  var hoyMs=Math.floor(ahoraCL()/DIA)*DIA, hoy=dstr(hoyMs), mesAct=hoy.slice(0,7);
+  var min=hs.reduce(function(a,r){return r[0]<a?r[0]:a;},hs[0][0]).slice(0,7);
+  var meses=[], y=+mesAct.slice(0,4), mm=+mesAct.slice(5,7), i;
+  for(i=0;i<12;i++){meses.unshift(y+'-'+(mm<10?'0':'')+mm);mm--;if(mm===0){mm=12;y--;}}
+  meses=meses.filter(function(k){return k>=min;});
+  var cn={}, cs={}, cc={};
+  meses.forEach(function(k){cn[k]=0;cs[k]=0;cc[k]=0;});
+  hs.forEach(function(r){var k=r[0].slice(0,7);if(cn[k]!==undefined){cn[k]++;if(r[1]){cs[k]+=r[1];cc[k]++;}}});
+  var et=meses.map(mesTxt), vn=meses.map(function(k){return cn[k];}), vs=meses.map(function(k){return cs[k]/1e6;});
+  // Comparación: últimos 30 días contra los 30 días anteriores
+  var a1=dstr(hoyMs-29*DIA), b2=dstr(hoyMs-30*DIA), b1=dstr(hoyMs-59*DIA);
+  function per(d,e){var n=0,s=0;hs.forEach(function(r){if(r[0]>=d&&r[0]<=e){n++;s+=r[1]||0;}});return {n:n,s:s};}
+  var A=per(a1,hoy), B=per(b1,b2), desde=datos.historial_desde||'';
+  var comparable=!!desde && desde<=b1;
+  function variacion(a,b){
+    if(!b)return a?'<span class="var ref">Sin base de comparación</span>':'<span class="var ref">Sin actividad en ambos períodos</span>';
+    var p=(a-b)/b*100, t=(p>0?'+':'')+nf.format(Math.round(p))+' %';
+    if(!comparable)return '<span class="var ref">Aún no comparable (historial desde '+esc(fmtDia(desde))+')</span>';
+    if(Math.abs(p)<0.5)return '<span class="var">● Sin variación</span>';
+    return p>0?'<span class="var">▲ Aumenta '+t+'</span>':'<span class="var baja">▼ Disminuye '+t+'</span>';
+  }
+  var c1='<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Licitaciones publicadas · últimos 30 días</div><div class="val">'+nf.format(A.n)+'</div>'+
+         '<div class="ant">Período anterior (30 días previos): '+nf.format(B.n)+'</div>'+variacion(A.n,B.n)+'</div>';
+  var c2='<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-coin"/></svg>Monto informado (CLP) · últimos 30 días</div><div class="val">'+(A.s?fmtMM(A.s):'—')+'</div>'+
+         '<div class="ant">Período anterior (30 días previos): '+(B.s?fmtMM(B.s):'—')+'</div>'+variacion(A.s,B.s)+'</div>';
+  var tabla='<table class="mini"><thead><tr><th scope="col">Mes</th><th scope="col">Licitaciones publicadas</th><th scope="col">Monto informado (CLP)</th><th scope="col">Con monto</th></tr></thead><tbody>'+
+    meses.slice().reverse().map(function(k){return '<tr><td>'+esc(mesTxt(k))+(k===mesAct?' (en curso)':'')+'</td><td class="num">'+nf.format(cn[k])+'</td><td class="num">'+(cs[k]?fmtMM(cs[k]):'—')+'</td><td class="num">'+nf.format(cc[k])+'</td></tr>';}).join('')+'</tbody></table>';
+  el.innerHTML=
+    '<div class="comp">'+c1+c2+'</div>'+
+    '<div class="evo"><div class="c"><h3>Licitaciones publicadas por mes</h3><div id="evo-n"></div></div>'+
+    '<div class="c"><h3>Monto informado por mes (millones de pesos, MM)</h3><div id="evo-m"></div></div></div>'+
+    '<p class="evo-nota">* Mes en curso: aún incompleto, por eso se dibuja con línea punteada. Los montos suman solo licitaciones en pesos (CLP) que informan presupuesto.</p>'+
+    (comparable?'':'<p class="evo-nota aviso-h"><strong>Serie en construcción.</strong> El panel comenzó a guardar historial el '+esc(fmtDia(desde))+'. Hasta reunir al menos 60 días, los meses y el período anterior solo incluyen licitaciones que seguían vigentes cuando el panel las detectó, así que subestiman la actividad real y la comparación es solo referencial.</p>')+
+    '<details class="datos"><summary>Ver datos mensuales en tabla</summary>'+tabla+'</details>';
+  EVO={et:et,vn:vn,vs:vs,parcial:meses[meses.length-1]===mesAct};
+  dibujarEvo();
+}
+function dibujarEvo(){
+  if(!EVO||!$('#evo-n'))return;
+  var par=EVO.parcial;
+  lineas($('#evo-n'),EVO.et,EVO.vn,{color:'#006EDC',entero:true,parcial:par,fmtEje:function(v){return nf.format(v);},fmtVal:function(v){return nf.format(v)+' licitaciones';},
+    aria:'Licitaciones publicadas por mes: '+EVO.et.map(function(e,i){return e+' '+EVO.vn[i];}).join(', ')});
+  lineas($('#evo-m'),EVO.et,EVO.vs,{color:'#E74100',parcial:par,fmtEje:numMM,fmtVal:function(v){return '$ '+numMM(v)+' MM';},
+    aria:'Monto informado por mes en millones de pesos: '+EVO.et.map(function(e,i){return e+' '+numMM(EVO.vs[i]);}).join(', ')});
+}
+
+/* ---- Ficha individual ---- */
+var ultimoFoco=null;
+function item(t,v,full){return '<div'+(full?' class="full"':'')+'><dt>'+t+'</dt><dd>'+v+'</dd></div>';}
+function abrirFicha(id){
+  var f=porId[id]; if(!f)return;
+  var l=f.l, d=$('#ficha'), u=urlSegura(l);
+  $('#ficha-cod').textContent='Licitación '+l.id;
+  $('#ficha-t').textContent=l.nombre||l.id;
+  var clasif=l.afin?('Afín a construcción'+(l.linea?' · '+esc(l.linea):'')+'<span class="uni"><br>'+esc(MOTIVOS[l.afin_motivo]||'Clasificación referencial')+'</span>'):'No clasificada como construcción e infraestructura';
+  var plazo=(f.ms===Infinity?'<span class="badge u30">Sin fecha</span>':badge(f));
+  $('#ficha-in').innerHTML='<dl class="fi">'+
+    item('Organismo comprador',esc(l.organismo||'—')+(l.unidad?'<span class="uni"><br>'+esc(l.unidad)+'</span>':'')+(l.ministerio?'<span class="uni"><br>'+esc(l.ministerio)+'</span>':''))+
+    item('Comuna y sector',esc(f.comuna||'Comuna no informada')+'<span class="uni"><br>Sector: '+esc(l.sector||'—')+'</span>')+
+    item('Presupuesto estimado',fmtMonto(l.monto,l.moneda)+'<span class="uni"><br>Monto referencial informado por el organismo</span>')+
+    item('Estado del proceso',esc(l.estado||'—')+(l.tipo?'<span class="uni"><br>'+esc(l.tipo)+(l.tipo_nombre?' · '+esc(l.tipo_nombre):'')+'</span>':''))+
+    item('Fecha de publicación',esc(fmtFecha(l.publicacion)))+
+    item('Fecha de cierre',esc(fmtFecha(l.cierre))+'<br>'+plazo)+
+    item('Clasificación CChC (referencial)',clasif,true)+
+    ((l.rubros||[]).length?item('Rubros en Mercado Público',esc(l.rubros.join(' · ')),true):'')+
+    (l.descripcion?item('Descripción','<div class="desc" style="font-weight:400;white-space:pre-line;max-height:240px;overflow:auto;border:1px solid #E6E8EB;border-radius:8px;padding:8px 10px;background:#F1F2F4">'+esc(l.descripcion)+'</div>',true):'')+
+  '</dl>';
+  $('#ficha-mp').setAttribute('href',u);
+  ultimoFoco=document.activeElement;
+  if(d.showModal){if(!d.open)d.showModal();}else d.setAttribute('open','');
+  document.body.style.overflow='hidden';
+  $('#ficha-in').scrollTop=0;
+  try{history.replaceState(null,'','#ficha='+encodeURIComponent(id));}catch(e){}
+}
+function cerrarFicha(){var d=$('#ficha');if(d.close&&d.open)d.close();else{d.removeAttribute('open');alCerrarFicha();}}
+function alCerrarFicha(){
+  document.body.style.overflow='';
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  if(ultimoFoco&&ultimoFoco.focus&&document.contains(ultimoFoco))ultimoFoco.focus();
 }
 
 /* ---- Gráficos de barras ---- */
@@ -429,6 +763,9 @@ function graficos(){
   var a,c,m,t;
   a=filtradas('tramo'); c=contar(a,function(f){return f.tramo;});
   barras('#g-plazo',TRAMOS.map(function(x,i){return {k:x[0],nombre:x[1],val:c[x[0]]||0,txt:nf.format(c[x[0]]||0),urg:i<2};}),'tramo');
+
+  a=filtradas('linea'); c=contar(a,function(f){return f.l.linea;});
+  barras('#g-linea',LINEAS.map(function(k){return {k:k,nombre:k,val:c[k]||0,txt:nf.format(c[k]||0)};}),'linea',{largo:true});
 
   a=filtradas('tipo'); c=contar(a,function(f){return f.l.tipo;});
   var nombres={}; filas.forEach(function(f){if(f.l.tipo&&!nombres[f.l.tipo])nombres[f.l.tipo]=(f.l.tipo_nombre||'').replace(/^Pública /,'');});
@@ -494,7 +831,7 @@ function mapaActualizar(){
     var icono=L.divIcon({className:'mk-wrap',iconSize:[tam,tam],html:'<div class="mk'+(urg?' urg':'')+(sel?' sel':'')+'" style="width:'+tam+'px;height:'+tam+'px">'+n+'</div>'});
     var lista=fs.slice(0,4).map(function(f){
       var d=f.ms===Infinity?'sin fecha':(f.dias===0?'hoy':f.dias===1?'1 día':f.dias+' días');
-      return '<li><a href="'+esc(urlSegura(f.l))+'" target="_blank" rel="noopener noreferrer">'+esc(f.l.id)+'</a> · '+esc(d)+'<br>'+esc(String(f.l.nombre).slice(0,70))+'</li>';
+      return '<li><button type="button" class="lnk" data-ficha="'+esc(f.l.id)+'" title="Abrir ficha">'+esc(f.l.id)+'</button> · '+esc(d)+'<br>'+esc(String(f.l.nombre).slice(0,70))+'</li>';
     }).join('');
     var html='<div class="pop"><h3>'+esc(c.nombre)+'</h3>'+
       '<div class="l"><strong>'+n+'</strong> licitaci'+(n===1?'ón':'ones')+' · '+fs.filter(function(f){return f.dias<=7;}).length+' cierran en 7 días o menos</div>'+
@@ -535,9 +872,9 @@ function tabla(arr){
     var rubTxt=rub.length?esc(rub[0])+(rub.length>1?' <span class="uni">+'+(rub.length-1)+' más</span>':''):'<span class="sinmonto">—</span>';
     return '<tr>'+
       '<td class="dias" data-et="Plazo">'+badge(f)+'<span class="cierre">Cierra '+esc(fmtFecha(l.cierre))+'</span></td>'+
-      '<td data-et="ID"><a class="id" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(l.id)+'</a><br><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Ver ficha ↗</a></td>'+
-      '<td data-et="Licitación"><span class="nombre">'+esc(l.nombre)+'</span>'+(l.descripcion&&l.descripcion!==l.nombre?'<span class="desc">'+esc(l.descripcion.slice(0,140))+(l.descripcion.length>140?'…':'')+'</span>':'')+
-        (l.tipo?'<span class="tipo">'+esc(l.tipo)+' · '+esc(l.tipo_nombre||'')+'</span>':'')+(f.nueva?'<span class="etq nueva">Nueva</span>':'')+(l.afin?'<span class="etq">Afín a construcción</span>':'')+'</td>'+
+      '<td data-et="ID"><a class="id" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(l.id)+'</a><br><button type="button" class="btn sm" data-ficha="'+esc(l.id)+'">Ver ficha</button><br><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Mercado Público ↗</a></td>'+
+      '<td data-et="Licitación"><button type="button" class="lnk nombre" data-ficha="'+esc(l.id)+'">'+esc(l.nombre)+'</button>'+(l.descripcion&&l.descripcion!==l.nombre?'<span class="desc">'+esc(l.descripcion.slice(0,140))+(l.descripcion.length>140?'…':'')+'</span>':'')+
+        (l.tipo?'<span class="tipo">'+esc(l.tipo)+' · '+esc(l.tipo_nombre||'')+'</span>':'')+(f.nueva?'<span class="etq nueva">Nueva</span>':'')+(l.afin?'<span class="etq" title="'+esc(MOTIVOS[l.afin_motivo]||'Clasificación referencial')+'">Afín a construcción</span>':'')+(l.afin&&l.linea?'<span class="etq lin">'+esc(l.linea)+'</span>':'')+'</td>'+
       '<td data-et="Organismo comprador"><span class="org">'+esc(l.organismo)+'</span>'+(l.unidad?'<span class="uni">'+esc(l.unidad)+'</span>':'')+(l.ministerio?'<span class="min">'+esc(l.ministerio)+'</span>':'')+'</td>'+
       '<td data-et="Comuna">'+esc(f.comuna||'—')+'</td>'+
       '<td data-et="Sector">'+esc(l.sector||'—')+'</td>'+
@@ -557,16 +894,16 @@ function tabla(arr){
 
 function render(){
   var arr=filtradas().sort(cmp);
-  kpis(arr); mapaActualizar(); graficos(); cabecera(); tabla(arr);
+  kpis(arr); destacadas(arr); alertas(); mapaActualizar(); graficos(); evolucion(); cabecera(); tabla(arr);
 }
 
 function exportarCSV(){
   var arr=filtradas().sort(cmp);
-  var cab=['ID','Licitación','Organismo','Unidad compradora','Comuna','Sector','Ministerio','Rubros','Tipo','Monto estimado','Moneda','Fecha de cierre','Días restantes','Link ficha'];
+  var cab=['ID','Licitación','Organismo','Unidad compradora','Comuna','Sector','Ministerio','Rubros','Línea de negocio','Tipo','Monto estimado','Moneda','Fecha de cierre','Días restantes','Link ficha'];
   function q(v){v=String(v==null?'':v);return '"'+v.replace(/"/g,'""')+'"';}
   var lin=[cab.map(q).join(';')];
   arr.forEach(function(f){var l=f.l;
-    lin.push([l.id,l.nombre,l.organismo,l.unidad,f.comuna,l.sector,l.ministerio||'',(l.rubros||[]).join(' | '),l.tipo||'',l.monto==null?'':l.monto,l.moneda||'',fmtFecha(l.cierre),f.ms===Infinity?'':f.dias,urlSegura(l)].map(q).join(';'));
+    lin.push([l.id,l.nombre,l.organismo,l.unidad,f.comuna,l.sector,l.ministerio||'',(l.rubros||[]).join(' | '),l.linea||'',l.tipo||'',l.monto==null?'':l.monto,l.moneda||'',fmtFecha(l.cierre),f.ms===Infinity?'':f.dias,urlSegura(l)].map(q).join(';'));
   });
   var blob=new Blob(['﻿'+lin.join('\r\n')],{type:'text/csv;charset=utf-8'});
   var a=document.createElement('a'), hoy=new Date().toISOString().slice(0,10);
@@ -574,6 +911,12 @@ function exportarCSV(){
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
 }
 
+var MOTIVOS={
+  codigo:'Clasificada como construcción por el código de rubro de Mercado Público',
+  nombre:'Clasificada como construcción por el nombre o el rubro de la licitación',
+  organismo:'Clasificada como construcción por el organismo comprador (obras públicas)',
+  descripcion:'Clasificada como construcción por el contexto de la descripción de la licitación'
+};
 function sincAlcance(){
   $('#seg-cons').setAttribute('aria-pressed',F.afin?'true':'false');
   $('#seg-todas').setAttribute('aria-pressed',F.afin?'false':'true');
@@ -584,18 +927,36 @@ function contarAlcance(){
 }
 
 function ligar(){
-  var map={'#f-sector':'sector','#f-organismo':'organismo','#f-comuna':'comuna','#f-tramo':'tramo','#f-monto':'monto','#f-tipo':'tipo','#f-rubro':'rubro'};
+  var map={'#f-sector':'sector','#f-organismo':'organismo','#f-comuna':'comuna','#f-tramo':'tramo','#f-monto':'monto','#f-tipo':'tipo','#f-linea':'linea','#f-rubro':'rubro'};
   Object.keys(map).forEach(function(id){$(id).addEventListener('change',function(e){F[map[id]]=e.target.value;pagina=1;render();});});
   var t; $('#f-q').addEventListener('input',function(e){clearTimeout(t);var v=e.target.value;t=setTimeout(function(){F.q=v;pagina=1;render();},180);});
   document.querySelectorAll('.seg').forEach(function(b){b.addEventListener('click',function(){F.afin=b.getAttribute('data-alc')==='1';sincAlcance();pagina=1;render();});});
   $('#f-nueva').addEventListener('change',function(e){F.nueva=e.target.checked;pagina=1;render();});
   $('#limpiar').addEventListener('click',function(){
     F=Object.assign({},F0);
-    $('#f-q').value='';sincAlcance();$('#f-nueva').checked=false;Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
+    $('#f-q').value='';sincAlcance();$('#f-nueva').checked=false;F.alerta='';Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
   });
   $('#exportar').addEventListener('click',exportarCSV);
   $('#centrar').addEventListener('click',centrarMapa);
+  $('#ficha-x').addEventListener('click',cerrarFicha);
+  $('#ficha-c').addEventListener('click',cerrarFicha);
+  $('#ficha').addEventListener('close',alCerrarFicha);
+  $('#ficha').addEventListener('click',function(e){if(e.target===$('#ficha'))cerrarFicha();});
+  var rz; window.addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(dibujarEvo,150);});
   document.addEventListener('click',function(e){
+    var fi=e.target.closest&&e.target.closest('[data-ficha]');
+    if(fi){abrirFicha(fi.getAttribute('data-ficha'));return;}
+    var ff=e.target.closest&&e.target.closest('[data-filtra]');
+    if(ff){var tf=ff.getAttribute('data-filtra'),kf=ff.getAttribute('data-k');F[tf]=(F[tf]===kf)?'':kf;$('#f-'+tf).value=F[tf];pagina=1;render();return;}
+    var al=e.target.closest&&e.target.closest('[data-alerta]');
+    if(al){
+      var ka=al.getAttribute('data-alerta');
+      if(ka==='nueva'){F.nueva=!F.nueva;$('#f-nueva').checked=F.nueva;}
+      else F.alerta=(F.alerta===ka)?'':ka;
+      pagina=1;render();
+      if(F.nueva||F.alerta)$('#tabla-sec').scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
     var pm=e.target.closest&&e.target.closest('.pm');
     if(pm){var nom=pm.getAttribute('data-comuna');F.comuna=(F.comuna===nom)?'':nom;$('#f-comuna').value=F.comuna;pagina=1;if(mapa)mapa.closePopup();render();return;}
     var b=e.target.closest&&e.target.closest('.bar');
@@ -615,7 +976,10 @@ function iniciar(d){
   if(d.parcial)av+='<div class="aviso info" role="note">Actualización parcial: faltan '+nf.format(d.sin_clasificar||0)+' licitaciones por clasificar. Se completarán en la próxima ejecución automática.</div>';
   $('#avisos').innerHTML=av;
   $('#pie-datos').textContent='Se revisaron '+nf.format(d.total_activas_pais||0)+' licitaciones activas del país; '+nf.format(d.total_region||0)+' correspondían a la Región de O\'Higgins al momento de la actualización.';
+  porId={}; filas.forEach(function(f){porId[f.l.id]=f;});
   iniciarMapa(); prepararFiltros(); contarAlcance(); sincAlcance(); ligar(); render();
+  var mh=/^#ficha=(.+)$/.exec(location.hash||'');
+  if(mh){try{abrirFicha(decodeURIComponent(mh[1]));}catch(e){}}
 }
 
 fetch('data.json?v='+Date.now(),{cache:'no-store'})
