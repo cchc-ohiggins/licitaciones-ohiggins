@@ -200,12 +200,30 @@ dl.fi dd .uni{font-weight:400}
 dl.fi .full{grid-column:1/-1}
 dl.fi dd.desc{font-weight:400;white-space:pre-line;max-height:240px;overflow:auto;border:1px solid #E6E8EB;border-radius:8px;padding:8px 10px;background:var(--gris-t)}
 .fi-pie{padding:12px 18px;border-top:1px solid var(--borde);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;background:#fff}
+.semk{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:14px}
+.sem3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:14px}
+.sem3 .c{border:1px solid var(--borde);border-radius:var(--radio);padding:12px 14px;min-width:0}
+.sem3 h3,.semtop h3{margin:0 0 8px;font-size:14px;color:var(--azul-osc)}
+.sb{display:flex;justify-content:space-between;gap:10px;padding:5px 8px;font-size:13px;border-radius:6px;margin-bottom:4px;background:linear-gradient(90deg,var(--azul-t) var(--w),transparent var(--w))}
+.sb .n{overflow-wrap:anywhere}
+.sb .v{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.semtop{border:1px solid var(--borde);border-radius:var(--radio);padding:12px 14px;margin-bottom:14px}
+.semtop ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.semtop li{font-size:13.5px}
+.semtop li small{display:block;color:var(--texto-2);font-size:12.5px}
+.semcopia{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--azul-t);border:1px solid var(--azul);border-radius:var(--radio);padding:12px 14px}
+.semcopia .ok{font-size:13px;font-weight:600;color:var(--azul-osc)}
+.msg-cab h3{margin:0;font-size:15px;color:var(--azul-osc)}
+.msg{white-space:pre-wrap;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text;background:#fff;border:1px solid var(--borde);border-left:5px solid var(--naranja);border-radius:var(--radio);padding:16px 18px;font-size:14.5px;line-height:1.65;color:var(--texto)}
+.msg a{color:var(--azul)}
+details.datos textarea{width:100%;min-height:260px;margin-top:8px;font:13px/1.5 inherit;font-family:inherit;border:1px solid var(--borde);border-radius:8px;padding:10px;background:#fff;color:var(--texto)}
 .estado{padding:36px 16px;text-align:center;color:var(--texto-2)}
 .estado strong{display:block;color:var(--azul-osc);font-size:16px;margin-bottom:4px}
 footer{max-width:1280px;margin:0 auto;padding:6px 20px 32px;font-size:12.5px;color:var(--texto-2)}
 footer p{margin:4px 0}
 @media (max-width:1000px){
   .dest,.alertas,.evo,.comp{grid-template-columns:1fr}
+  .semk{grid-template-columns:repeat(2,1fr)}
   .graficos{grid-template-columns:1fr}
   .filtros{grid-template-columns:1fr 1fr}
   .filtros .busca{grid-column:1/-1}
@@ -378,6 +396,12 @@ footer p{margin:4px 0}
     <h2><svg class="ic" aria-hidden="true"><use href="#i-trend"/></svg>Evolución mensual de las licitaciones</h2>
     <p class="nota" id="evo-alcance"></p>
     <div id="evo-in"></div>
+  </section>
+
+  <section class="panel" aria-label="Resumen de la semana" id="sem-sec">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-cal"/></svg>Resumen de la semana</h2>
+    <p class="nota" id="sem-alcance"></p>
+    <div id="sem-in"></div>
   </section>
 </main>
 
@@ -711,6 +735,110 @@ function dibujarEvo(){
     aria:'Monto informado por mes en millones de pesos: '+EVO.et.map(function(e,i){return e+' '+numMM(EVO.vs[i]);}).join(', ')});
 }
 
+/* ---- Resumen de la semana ---- */
+var TEXTO_SEM='', ASUNTO='';
+function bonito(t,max){
+  t=String(t||'').trim();
+  var L=t.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g,''), U=t.replace(/[^A-ZÁÉÍÓÚÑ]/g,'');
+  if(L.length>6 && U.length/L.length>0.7){t=t.toLowerCase();}
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  if(max&&t.length>max)t=t.slice(0,max-1).replace(/\s+\S*$/,'')+'…';
+  return t;
+}
+function corto(s){return s?s.slice(8,10)+'-'+s.slice(5,7):'';}
+function filasSemana(){
+  var ahora=ahoraCL();
+  return filas.filter(function(f){
+    return (!F.afin||f.l.afin) && f.pub>0 && (ahora-f.pub)<=7*DIA && f.pub<=ahora+36e5;
+  });
+}
+function lista(items,fmtV,max){
+  var mx=Math.max.apply(null,items.map(function(i){return i[1];}).concat([1]));
+  return items.slice(0,max).map(function(i){
+    return '<div class="sb" style="--w:'+Math.round(i[1]/mx*100)+'%"><span class="n">'+esc(i[0])+'</span><span class="v">'+fmtV(i)+'</span></div>';
+  }).join('')||'<div class="nota">Sin datos.</div>';
+}
+function resumenSemana(){
+  var el=$('#sem-in'); if(!el)return;
+  var hoyMs=Math.floor(ahoraCL()/DIA)*DIA, d1=dstr(hoyMs-6*DIA), d2=dstr(hoyMs);
+  var alc=F.afin?'construcción e infraestructura':'todas las licitaciones';
+  $('#sem-alcance').textContent='Últimos 7 días ('+fmtDia(d1)+' al '+fmtDia(d2)+'). Alcance: '+alc+', según el selector de arriba. Incluye las licitaciones publicadas en ese período que siguen vigentes; no depende de los otros filtros.';
+  var sem=filasSemana(), n=sem.length, clp=sem.filter(function(f){return esCLP(f.l);});
+  var total=clp.reduce(function(a,f){return a+f.l.monto;},0);
+  var base=filas.filter(function(f){return !F.afin||f.l.afin;});
+  var pronto=base.filter(function(f){return f.dias<=3;}).sort(function(a,b){return a.ms-b.ms;});
+  var orgM=sumar(sem,function(f){return f.l.organismo;}), orgN=contar(sem,function(f){return f.l.organismo;});
+  var orgs=ordenar(orgM).map(function(k){return [k,orgM[k],orgN[k]];});
+  var comN=contar(sem,function(f){return f.comuna;}), comM=sumar(sem,function(f){return f.comuna;});
+  var coms=Object.keys(comN).sort(function(a,b){return comN[b]-comN[a]||(comM[b]||0)-(comM[a]||0)||a.localeCompare(b,'es');}).map(function(k){return [k,comN[k],comM[k]||0];});
+  var mtN=contar(sem,function(f){return f.mt;});
+  var mts=MONTOS.filter(function(x){return mtN[x[0]];}).map(function(x){return [x[1],mtN[x[0]]];});
+  var cat=F.afin?contar(sem,function(f){return f.l.linea;}):contar(sem,function(f){return f.l.sector;});
+  var cats=Object.keys(cat).sort(function(a,b){return cat[b]-cat[a];}).map(function(k){return [k,cat[k]];});
+  var top=sem.slice().sort(function(a,b){
+    var am=esCLP(a.l)?a.l.monto:-1, bm=esCLP(b.l)?b.l.monto:-1;
+    return bm-am||b.pub-a.pub;
+  });
+  var pl=function(x,s,p){return x+' '+(x===1?s:p);};
+  // ---- texto para el correo ----
+  var MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  function dl(d){return (+d.slice(8,10))+' de '+MES[+d.slice(5,7)-1];}
+  var rango=(d1.slice(5,7)===d2.slice(5,7))?(+d1.slice(8,10))+' al '+dl(d2):dl(d1)+' al '+dl(d2);
+  var entre=(d1.slice(5,7)===d2.slice(5,7))?'el '+(+d1.slice(8,10))+' y el '+dl(d2):'el '+dl(d1)+' y el '+dl(d2);
+  var linea=n?(function(){var u=[];cats.forEach(function(c){u.push(c[0]+' ('+c[1]+')');});return u.join(', ');})():'';
+  var peq=clp.filter(function(f){return f.l.monto<5e7;}).length;
+  function gran(f){return bonito(f.l.nombre,110)+' — '+bonito(f.l.organismo)+(f.comuna?' ('+f.comuna+')':'')+', '+(esCLP(f.l)?fmtMM(f.l.monto):'monto no informado')+', '+textoPlazo(f)+' [ID '+f.l.id+']';}
+  ASUNTO='Licitaciones '+(F.afin?'de construcción ':'')+'en O\'Higgins · semana del '+rango;
+  var T=['Estimados socios y socias:','',
+    'Compartimos el resumen semanal de las licitaciones vigentes '+(F.afin?'de construcción e infraestructura ':'')+'en la Región de O\'Higgins, publicadas en Mercado Público entre '+entre+'.',''];
+  if(n){
+    T.push('LO MÁS RELEVANTE DE LA SEMANA');
+    T.push('• '+pl(n,'licitación nueva','licitaciones nuevas')+(clp.length?', con un monto informado total de '+fmtMM(total)+' ('+nf.format(clp.length)+' de '+nf.format(n)+' informan monto en pesos)':', ninguna con monto en pesos informado')+'.');
+    if(linea)T.push('• '+(F.afin?'Por tipo de negocio':'Por sector')+': '+linea+'.');
+    if(peq)T.push('• '+pl(peq,'licitación','licitaciones')+' con monto informado bajo los $ 50 MM.');
+    if(coms.length)T.push('• Comunas con más actividad: '+coms.slice(0,3).map(function(c){return c[0]+' ('+c[1]+')';}).join(', ')+'.');
+    if(orgs.length)T.push('• Organismos con mayor monto licitado: '+orgs.slice(0,3).map(function(o){return bonito(o[0])+' ('+fmtMM(o[1])+')';}).join('; ')+'.');
+    T.push('');
+    T.push('PRINCIPALES LICITACIONES');
+    top.slice(0,5).forEach(function(f,i){T.push((i+1)+'. '+gran(f));});
+    T.push('');
+  } else {T.push('En este período no se registraron licitaciones nuevas '+(F.afin?'de construcción ':'')+'vigentes en la región.');T.push('');}
+  if(pronto.length){
+    T.push('CIERRAN PRONTO (no deje pasar la fecha)');
+    pronto.slice(0,4).forEach(function(f){T.push('• '+gran(f));});
+    T.push('');
+  }
+  T.push('En el panel puede filtrar por comuna, organismo, monto o tipo de negocio, ver la ficha de cada licitación y abrir su enlace directo a Mercado Público:');
+  T.push(location.origin+location.pathname.replace(/index\.html$/,''));
+  T.push('');
+  T.push('Quedamos atentos a sus comentarios.');
+  T.push('');
+  T.push('Saludos cordiales,');
+  T.push('Área de Estudios · Cámara Chilena de la Construcción, Sede Región de O\'Higgins');
+  T.push('');
+  T.push('Fuente: Mercado Público (Dirección ChileCompra). La clasificación por tipo de negocio es referencial; verifique siempre las bases en el portal oficial.');
+  TEXTO_SEM=T.join('\n');
+  // ---- pantalla ----
+  var h='<div class="semk">'+
+    '<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Licitaciones nuevas</div><div class="val">'+nf.format(n)+'</div><div class="ant">Publicadas en los últimos 7 días</div></div>'+
+    '<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-coin"/></svg>Monto informado (CLP)</div><div class="val">'+(total?fmtMM(total):'—')+'</div><div class="ant">'+nf.format(clp.length)+' de '+nf.format(n)+' informan monto en pesos</div></div>'+
+    '<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg>Mayor monto</div><div class="val">'+(clp.length?fmtMM(Math.max.apply(null,clp.map(function(f){return f.l.monto;}))):'—')+'</div><div class="ant">Entre las nuevas de la semana</div></div>'+
+    '<div class="cmp"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Cierran en 3 días o menos</div><div class="val">'+nf.format(pronto.length)+'</div><div class="ant">Entre todas las vigentes del alcance</div></div></div>';
+  if(n){
+    h+='<div class="sem3">'+
+      '<div class="c"><h3>Organismos por monto informado</h3>'+lista(orgs,function(i){return fmtMM(i[1]);},5)+'</div>'+
+      '<div class="c"><h3>Comunas por número de licitaciones</h3>'+lista(coms,function(i){return nf.format(i[1]);},5)+'</div>'+
+      '<div class="c"><h3>Rangos de monto</h3>'+lista(mts,function(i){return nf.format(i[1]);},7)+'</div>'+
+      '<div class="c"><h3>'+(F.afin?'Líneas de negocio':'Sectores')+'</h3>'+lista(cats,function(i){return nf.format(i[1]);},6)+'</div></div>'+
+      '<div class="semtop"><h3>Principales licitaciones de la semana</h3><ol>'+top.slice(0,10).map(function(f){
+        return '<li><button type="button" class="lnk" data-ficha="'+esc(f.l.id)+'">'+esc(String(f.l.nombre).slice(0,100))+'</button>'+
+          '<small>'+esc(f.l.organismo)+(f.comuna?' · '+esc(f.comuna):'')+' · '+(esCLP(f.l)?fmtMM(f.l.monto):'monto no informado')+' · '+esc(textoPlazo(f))+'</small></li>';}).join('')+'</ol></div>';
+  } else h+='<div class="vacio-g">No hay licitaciones nuevas de este alcance en los últimos 7 días.</div>';
+  var url=location.origin+location.pathname.replace(/index\.html$/,'');
+  var cuerpo=esc(TEXTO_SEM).replace(esc(url),'<a href="'+esc(url)+'">'+esc(url)+'</a>');
+  h+='<div class="msg-cab"><h3>Mensaje resumen de la semana</h3><p class="nota" style="margin:2px 0 8px">'+esc(ASUNTO)+'. Puede seleccionar el texto y copiarlo.</p></div><div class="msg" id="sem-msg">'+cuerpo+'</div>';
+  el.innerHTML=h;
+}
 /* ---- Ficha individual ---- */
 var ultimoFoco=null;
 function item(t,v,full){return '<div'+(full?' class="full"':'')+'><dt>'+t+'</dt><dd>'+v+'</dd></div>';}
@@ -894,7 +1022,7 @@ function tabla(arr){
 
 function render(){
   var arr=filtradas().sort(cmp);
-  kpis(arr); destacadas(arr); alertas(); mapaActualizar(); graficos(); evolucion(); cabecera(); tabla(arr);
+  kpis(arr); destacadas(arr); alertas(); mapaActualizar(); graficos(); evolucion(); resumenSemana(); cabecera(); tabla(arr);
 }
 
 function exportarCSV(){
