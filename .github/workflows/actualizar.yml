@@ -2,14 +2,18 @@ name: Actualizar panel de licitaciones
 
 on:
   schedule:
-    # Dos veces al día (hora UTC): ~07:30 y ~13:30 en Chile en horario de verano.
-    - cron: "30 10 * * *"
-    - cron: "30 16 * * *"
-  workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
+    # Cuatro veces al dia (hora UTC). En Chile en horario de verano (UTC-3) equivalen a
+    # ~07:07, ~10:47, ~13:47 y ~18:07. Se usan minutos poco comunes porque GitHub atrasa mas
+    # las ejecuciones programadas en horas redondas (en punto y y media), que son las mas usadas.
+    - cron: "7 10 * * *"
+    - cron: "47 13 * * *"
+    - cron: "47 16 * * *"
+    - cron: "7 21 * * *"
+  workflow_dispatch:   # permite lanzarlo a mano desde la pestana Actions
 
 permissions:
   contents: write      # guardar data/cache.json y docs/data.json
-  pages: write         # publicar la página
+  pages: write         # publicar la pagina
   id-token: write
 
 concurrency:
@@ -36,7 +40,7 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Consultar Mercado Público y generar los datos
+      - name: Consultar Mercado Publico y generar los datos
         env:
           MERCADO_PUBLICO_TICKET: ${{ secrets.MERCADO_PUBLICO_TICKET }}
         run: python actualizar_licitaciones.py
@@ -49,18 +53,18 @@ jobs:
           if git diff --cached --quiet; then
             echo "Sin cambios que guardar."
           else
-            git commit -m "Actualización de datos $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git commit -m "Actualizacion de datos $(date -u '+%Y-%m-%d %H:%M') UTC"
             git push
           fi
 
-      - name: Configurar la publicación
+      - name: Configurar la publicacion
         uses: actions/configure-pages@v5
 
-      - name: Preparar la página
+      - name: Preparar la pagina
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
-      - name: Publicar la página
+      - name: Publicar la pagina
         id: deployment
         uses: actions/deploy-pages@v4
