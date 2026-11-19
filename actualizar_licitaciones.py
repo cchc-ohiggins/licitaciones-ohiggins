@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Actualiza los datos del panel de licitaciones activas de Mercado Público
-para la Región de O'Higgins (CChC O'Higgins, Estudios).
+para la Región de O'Higgins.
 
 Qué hace, paso a paso:
   1. Pide a la API de Mercado Público el listado de licitaciones ACTIVAS del país.
@@ -11,6 +11,9 @@ Qué hace, paso a paso:
      así cada día solo se consultan las licitaciones nuevas (cuida el cupo diario).
   3. Se queda con las de la Región de O'Higgins y genera docs/data.json,
      que es lo que lee el dashboard (docs/index.html).
+  4. Seguimiento: las licitaciones de la región que dejan de estar activas pasan a una lista de
+     seguimiento. Cada cierto tiempo se consulta su estado (Cerrada, Desierta, Revocada, Adjudicada...)
+     y, si fue adjudicada, la empresa y el monto. Queda en docs/cerradas.json (docs/seguimiento.html).
 
 El ticket de la API se lee SOLO desde la variable de entorno MERCADO_PUBLICO_TICKET
 (en GitHub: Settings > Secrets and variables > Actions). Nunca se escribe en archivos
@@ -40,6 +43,7 @@ import requests
 RAIZ = Path(__file__).resolve().parent
 RUTA_CACHE = RAIZ / "data" / "cache.json"
 RUTA_SALIDA = RAIZ / "docs" / "data.json"
+RUTA_CERRADAS = RAIZ / "docs" / "cerradas.json"
 TZ = ZoneInfo("America/Santiago")
 
 BASE_URL = os.environ.get("MP_BASE_URL", "https://api.mercadopublico.cl").rstrip("/")
@@ -57,6 +61,12 @@ MAX_MINUTOS = float(os.environ.get("MP_MAX_MINUTOS", "190"))
 # Cada cuántos días se vuelve a consultar el detalle de las licitaciones de la región
 # (para captar cambios de descripción o monto).
 REFRESCO_DIAS = int(os.environ.get("MP_REFRESCO_DIAS", "7"))
+# Seguimiento de licitaciones cerradas: hasta cuántos días después del cierre se sigue buscando
+# resultado (adjudicada, desierta, revocada), cuántas consultas como máximo por ejecución y
+# cuántos días se conservan en la tabla.
+SEG_MAX_DIAS = int(os.environ.get("MP_SEG_MAX_DIAS", "150"))
+SEG_MAX_CONSULTAS = int(os.environ.get("MP_SEG_MAX_CONSULTAS", "250"))
+SEG_RETENCION_DIAS = int(os.environ.get("MP_SEG_RETENCION_DIAS", "400"))
 # Plantilla del link directo a la ficha. Si Mercado Público cambia el formato,
 # basta ajustar esta línea. Alternativa:
 # https://www.mercadopublico.cl/fichaLicitacion.html?idLicitacion={codigo}
@@ -424,7 +434,17 @@ def tipo_de(codigo: str, lic: dict):
     return t, TIPOS.get(t, t)
 
 
-ESTADOS = {5: "Publicada", 6: "Cerrada", 7: "Desierta", 8: "Adjudicada", 15: "Revocada", 18: "Suspendida", 19: "Suspendida"}
+ESTADOS = {5: "Publicada", 6: "Cerrada", 7: "Desierta", 8: "Adjudicada", 15: "Revocada", 18: "Revocada", 19: "Suspendida"}
+
+
+def estado_norm(texto) -> str:
+    """Deja el estado con un nombre simple: Publicada, Cerrada, Desierta, Adjudicada, Revocada o Suspendida."""
+    t = normalizar(texto)
+    for clave, nombre in (("desiert", "Desierta"), ("revoc", "Revocada"), ("adjudic", "Adjudicada"),
+                          ("suspend", "Suspendida"), ("cerrad", "Cerrada"), ("public", "Publicada")):
+        if t.startswith(clave):
+            return nombre
+    return str(texto or "").strip() or "Cerrada"
 
 
 def estado_de(lic: dict, item_lista: dict) -> str:
@@ -502,6 +522,231 @@ def construir_entrada(lic: dict, item_lista: dict, hoy: str) -> dict:
 
 
 # --------------------------------------------------------------------------- #
+# Seguimiento de licitaciones cerradas
+# --------------------------------------------------------------------------- #
+# Cuando una licitación de la región deja de estar activa, queda en cache["cerradas"]. Cada cierto
+# tiempo se consulta su estado y, si fue adjudicada, la empresa y el monto adjudicado.
+CAMPOS_CERRADA = ("id", "nombre", "descripcion", "tipo_nombre", "organismo", "unidad", "comuna", "sector",
+                  "rubros", "afin_cod", "afin_motivo", "monto", "moneda", "publicacion", "cierre", "url")
+
+
+def a_fecha(texto):
+    try:
+        return datetime.strptime(str(texto)[:10], "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def compactar(reg: dict) -> dict:
+    """Deja solo lo necesario de una licitación para la tabla de seguimiento."""
+    c = {k: reg.get(k) for k in CAMPOS_CERRADA}
+    c["descripcion"] = (c.get("descripcion") or "")[:500]
+    c["rubros"] = (c.get("rubros") or [])[:4]
+    return c
+
+
+def extraer_adjudicacion(lic: dict):
+    """Datos de adjudicación que informa la API: fecha, oferentes, acta y empresas con su monto.
+    Devuelve None si la licitación aún no informa nada de esto."""
+    adj = lic.get("Adjudicacion") if isinstance(lic.get("Adjudicacion"), dict) else {}
+    items = (lic.get("Items") or {}).get("Listado") or []
+    por_empresa = {}
+    for it in items:
+        a = it.get("Adjudicacion") if isinstance(it.get("Adjudicacion"), dict) else None
+        if not a:
+            continue
+        rut = str(a.get("RutProveedor") or "").strip()
+        nombre = str(a.get("NombreProveedor") or "").strip()
+        if not (rut or nombre):
+            continue
+        cant, unit = a.get("Cantidad"), a.get("MontoUnitario")
+        monto = cant * unit if es_numero(cant) and es_numero(unit) else 0
+        e = por_empresa.setdefault(rut or normalizar(nombre), {"rut": rut, "nombre": nombre, "monto": 0})
+        e["monto"] += monto
+        if nombre and not e["nombre"]:
+            e["nombre"] = nombre
+    empresas = sorted(por_empresa.values(), key=lambda e: (-e["monto"], e["nombre"]))[:10]
+    try:
+        oferentes = int(adj.get("NumeroOferentes"))
+    except (TypeError, ValueError):
+        oferentes = None
+    acta = str(adj.get("UrlActa") or "").strip()
+    out = {
+        "fecha": fecha_iso(adj.get("Fecha")),
+        "oferentes": oferentes,
+        "acta": acta if acta.lower().startswith(("http://", "https://")) else None,
+        "empresas": [{"rut": e["rut"], "nombre": e["nombre"], "monto": round(e["monto"])} for e in empresas],
+    }
+    out["monto"] = sum(e["monto"] for e in out["empresas"]) or None
+    if not (out["empresas"] or out["fecha"] or out["oferentes"] or out["acta"]):
+        return None
+    return out
+
+
+def aplicar_detalle(c: dict, lic: dict, item_lista: dict, hoy: str, ahora_iso: str) -> bool:
+    """Actualiza una licitación en seguimiento con lo que informa la API (estado y adjudicación).
+    Devuelve False si resultó estar abierta de nuevo (plazo ampliado): ya no corresponde a esta lista."""
+    estado = estado_norm(estado_de(lic, item_lista))
+    cierre = fecha_iso((lic.get("Fechas") or {}).get("FechaCierre") or lic.get("FechaCierre")) or c.get("cierre")
+    if estado == "Publicada":
+        if cierre and cierre >= ahora_iso:
+            return False
+        estado = "Cerrada"
+    c["cierre"] = cierre
+    if estado != c.get("estado"):
+        c["estado"], c["estado_desde"] = estado, hoy
+    c["adj"] = extraer_adjudicacion(lic)
+    c["revisado"] = hoy
+    return True
+
+
+def resultado_final(c: dict, hoy_d) -> bool:
+    """True cuando ya no hace falta seguir consultando la licitación."""
+    e = c.get("estado")
+    if e in ("Desierta", "Revocada"):
+        return True
+    if e == "Adjudicada":
+        if (c.get("adj") or {}).get("empresas"):
+            return True
+        desde = a_fecha(c.get("estado_desde"))
+        return desde is not None and (hoy_d - desde).days >= 10   # la API no informó la empresa
+    return False
+
+
+def toca_revisar(c: dict, hoy_d) -> bool:
+    """Cada 2 días durante las 2 primeras semanas tras el cierre, cada 7 hasta los 60 días y cada 14 después."""
+    if c.get("final") or c.get("sin_resultado"):
+        return False
+    if not c.get("revisado"):
+        return True
+    cierre = a_fecha(c.get("cierre")) or a_fecha(c.get("desde")) or hoy_d
+    edad = (hoy_d - cierre).days
+    if edad > SEG_MAX_DIAS:
+        c["sin_resultado"] = True
+        return False
+    cada = 2 if edad <= 14 else 7 if edad <= 60 else 14
+    ultima = a_fecha(c.get("revisado"))
+    return ultima is None or (hoy_d - ultima).days >= cada
+
+
+def pasar_a_seguimiento(cache: dict, activas: dict, ahora_iso: str, hoy: str) -> int:
+    """Las licitaciones de la región que ya no están activas (o cuyo plazo venció) pasan a seguimiento.
+    Debe llamarse ANTES de borrar de la caché las que dejaron de estar activas."""
+    cerradas = cache.setdefault("cerradas", {})
+    cache.setdefault("seguimiento_desde", hoy)
+    nuevas = 0
+    for cod, e in cache["detalles"].items():
+        if e.get("r") != 1 or cod in cerradas or not e.get("d"):
+            continue
+        d = e["d"]
+        cierre = fecha_iso((activas.get(cod) or {}).get("FechaCierre")) or d.get("cierre")
+        if cod in activas and not (cierre and cierre < ahora_iso):
+            continue                      # sigue abierta
+        c = compactar(d)
+        c["cierre"] = cierre
+        c.update(estado="Cerrada", estado_desde=hoy, revisado=None, adj=None, desde=hoy)
+        cerradas[cod] = c
+        nuevas += 1
+    limite = a_fecha(hoy) - timedelta(days=SEG_RETENCION_DIAS)
+    for cod in [k for k, c in cerradas.items() if (a_fecha(c.get("cierre")) or a_fecha(hoy)) < limite]:
+        del cerradas[cod]
+    return nuevas
+
+
+def seguimiento(cache: dict, activas: dict, hoy: str, ahora_iso: str, t0: float):
+    """Consulta el estado de las licitaciones cerradas. Devuelve (consultadas, cupo_agotado)."""
+    cerradas = cache.setdefault("cerradas", {})
+    historial = cache.get("historial") or {}
+    descartadas = set(cache.setdefault("descartadas", []))
+    hoy_d = a_fecha(hoy)
+    # Las que el panel ya había registrado en su historial pero no están en seguimiento (cerraron antes de
+    # existir esta función) se recuperan consultándolas por su código.
+    recuperar = [c for c in historial if c not in activas and c not in cerradas and c not in descartadas]
+    revisar = sorted((c for c, v in cerradas.items() if toca_revisar(v, hoy_d)),
+                     key=lambda c: cerradas[c].get("revisado") or "")
+    cola = [(c, True) for c in recuperar] + [(c, False) for c in revisar]
+    log(f"Seguimiento: {len(cerradas)} en la lista; por recuperar del historial: {len(recuperar)}; por revisar: {len(revisar)}")
+    consultadas = seguidas = 0
+    for cod, recuperando in cola:
+        if consultadas >= SEG_MAX_CONSULTAS:
+            log(f"Seguimiento: tope de {SEG_MAX_CONSULTAS} consultas por ejecución; el resto sigue en la próxima.")
+            break
+        if (time.monotonic() - t0) / 60 >= MAX_MINUTOS:
+            log("Seguimiento: se acabó el tiempo de esta ejecución; el resto sigue en la próxima.")
+            break
+        try:
+            resp = consultar({"codigo": cod})
+        except ErrorCuota as e:
+            log(f"Seguimiento: cupo diario de la API agotado ({e}).")
+            cache["descartadas"] = sorted(descartadas)
+            return consultadas, True
+        except ErrorApi as e:
+            seguidas += 1
+            log(f"Aviso: falló el seguimiento de {cod}: {e}")
+            if seguidas >= 10:
+                break
+            continue
+        seguidas = 0
+        consultadas += 1
+        listado = resp.get("Listado") or []
+        if not listado:                      # la API no la devolvió: no se insiste en cada ejecución
+            if recuperando:
+                descartadas.add(cod)
+            else:
+                cerradas[cod]["revisado"] = hoy
+        else:
+            lic = listado[0]
+            if recuperando:
+                entrada = construir_entrada(lic, {}, hoy)
+                if entrada.get("r") != 1:
+                    descartadas.add(cod)
+                    time.sleep(PAUSA_SEG)
+                    continue
+                c = compactar(entrada["d"])
+                c.update(estado="Cerrada", estado_desde=hoy, revisado=None, adj=None, desde=hoy)
+                cerradas[cod] = c
+            else:
+                c = cerradas[cod]
+            if aplicar_detalle(c, lic, {}, hoy, ahora_iso):
+                c["final"] = resultado_final(c, hoy_d)
+            else:
+                cerradas.pop(cod, None)
+        if consultadas % 100 == 0:
+            guardar_cache(cache)
+        time.sleep(PAUSA_SEG)
+    cache["descartadas"] = sorted(descartadas)
+    return consultadas, False
+
+
+def exportar_cerradas(cache: dict, hoy: str) -> int:
+    """Escribe docs/cerradas.json con la tabla de seguimiento."""
+    regs = []
+    for c in (cache.get("cerradas") or {}).values():
+        r = dict(c)
+        motivo = "codigo" if r.pop("afin_cod", False) else motivo_afin(
+            r.get("nombre", ""), r.get("rubros"), r.get("sector", ""), r.get("descripcion", ""))
+        if motivo is None and r.get("afin_motivo") == "descripcion":
+            motivo = "descripcion"        # se clasificó por la descripción completa, que aquí está recortada
+        r["afin"] = motivo is not None
+        r["afin_motivo"] = motivo
+        r["linea"] = linea_de(r.get("nombre", ""), r.get("rubros")) if motivo else None
+        for k in ("final", "desde"):
+            r.pop(k, None)
+        regs.append(r)
+    regs.sort(key=lambda r: (r.get("cierre") or "", r.get("id") or ""), reverse=True)
+    salida = {
+        "generado": datetime.now(TZ).isoformat(timespec="seconds"),
+        "generado_texto": datetime.now(TZ).strftime("%d-%m-%Y %H:%M"),
+        "fuente": "Dirección ChileCompra - API de Mercado Público",
+        "desde": cache.get("historial_desde") or cache.get("seguimiento_desde") or hoy,
+        "total": len(regs),
+        "licitaciones": regs,
+    }
+    escribir_atomico(RUTA_CERRADAS, json.dumps(salida, ensure_ascii=False, separators=(",", ":")))
+    return len(regs)
+
+
+# --------------------------------------------------------------------------- #
 # Caché
 # --------------------------------------------------------------------------- #
 def cargar_cache() -> dict:
@@ -564,6 +809,9 @@ def main() -> int:
     cache = cargar_cache()
     detalles = cache["detalles"]
     inicializado = bool(cache.get("inicializado"))
+    nuevas_cerradas = pasar_a_seguimiento(cache, activas, ahora_iso, hoy)   # antes de borrar las inactivas
+    if nuevas_cerradas:
+        log(f"Licitaciones de la región que pasan a seguimiento (ya no están activas): {nuevas_cerradas}")
     for cod in [c for c in detalles if c not in activas]:  # ya no están activas
         del detalles[cod]
 
@@ -579,6 +827,7 @@ def main() -> int:
 
     consultadas = fallidas = seguidas = 0
     parcial, motivo = False, ""
+    cuota_agotada = False
     inicio_detalles = time.monotonic()
     for cod in pendientes:
         if consultadas >= MAX_DETALLES:
@@ -595,6 +844,7 @@ def main() -> int:
             return 3
         except ErrorCuota as e:
             parcial, motivo = True, f"cupo diario de la API agotado ({e})"
+            cuota_agotada = True
             break
         except ErrorApi as e:
             fallidas += 1
@@ -626,6 +876,19 @@ def main() -> int:
             log(f"  ...{consultadas} consultadas")
         time.sleep(PAUSA_SEG)
     guardar_cache(cache)
+
+    # Seguimiento de las cerradas (estado, empresa adjudicada, monto). Si falla, el panel de vigentes igual se actualiza.
+    if not cuota_agotada:
+        try:
+            n_seg, cuota_agotada = seguimiento(cache, activas, hoy, ahora_iso, inicio_detalles)
+            log(f"Seguimiento: {n_seg} consultas")
+        except ErrorTicket as e:
+            log(f"ERROR: la API rechazó el ticket ({e}).")
+            guardar_cache(cache)
+            return 3
+        except Exception as e:  # noqa: BLE001 - nada del seguimiento debe impedir publicar los vigentes
+            log(f"Aviso: el seguimiento de cerradas falló y se reintentará en la próxima ejecución: {ocultar(type(e).__name__ + ': ' + str(e))}")
+        guardar_cache(cache)
 
     sin_clasificar = sum(1 for c in activas if c not in detalles)
     if not sin_clasificar and not inicializado:  # primera carga completa: desde ahora se marcan las nuevas
@@ -687,6 +950,11 @@ def main() -> int:
     }
     escribir_atomico(RUTA_SALIDA, json.dumps(salida, ensure_ascii=False, separators=(",", ":")))
     log(f"Listo: {len(registros)} licitaciones vigentes en la Región de O'Higgins.")
+    try:
+        total_seg = exportar_cerradas(cache, hoy)
+        log(f"Seguimiento: {total_seg} licitaciones cerradas en docs/cerradas.json")
+    except Exception as e:  # noqa: BLE001
+        log(f"Aviso: no se pudo escribir cerradas.json: {ocultar(type(e).__name__ + ': ' + str(e))}")
     return 0
 
 
