@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seguimiento de licitaciones cerradas · Región de O'Higgins</title>
+<link rel="icon" href="data:,">
+<meta name="description" content="Seguimiento de las licitaciones de Mercado Público de la Región de O'Higgins después de su cierre: estado (adjudicada, desierta, revocada), empresa adjudicada y monto adjudicado.">
+<style>
+:root{
+  --naranja:#E74100; --azul:#006EDC; --azul-osc:#003D6B; --gris:#D9D9D9;
+  --naranja-t:#FFE6DA; --naranja-txt:#8F2700; --azul-t:#E3EFFC; --gris-t:#F1F2F4; --neutro:#7A8896;
+  --fondo:#F5F7FA; --tarjeta:#FFFFFF; --texto:#14283C; --texto-2:#4B5B6B; --borde:#D9D9D9;
+  --radio:10px;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--fondo);color:var(--texto);
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.45}
+a{color:var(--azul)}
+.cab{background:var(--azul-osc);color:#fff;border-bottom:4px solid var(--naranja)}
+.cab-in{max-width:1280px;margin:0 auto;padding:22px 20px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.cab h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.marca{display:flex;align-items:center;gap:16px}
+.cab .meta{text-align:right;font-size:13px;color:#C9DCF0}
+.cab .meta strong{color:#fff;font-size:15px;display:block}
+.tabs{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
+.tabs a{color:#C9DCF0;text-decoration:none;font-weight:600;font-size:14.5px;padding:10px 18px;border-radius:9px 9px 0 0}
+.tabs a:hover{color:#fff;background:rgba(255,255,255,.12)}
+.tabs a[aria-current="page"]{background:#fff;color:var(--azul-osc)}
+.tabs a:focus-visible{outline:3px solid #fff;outline-offset:-3px}
+.ic{width:1.2em;height:1.2em;vertical-align:-.22em;margin-right:7px;flex:none}
+main{max-width:1280px;margin:0 auto;padding:20px}
+.aviso{border-radius:var(--radio);padding:12px 16px;margin-bottom:14px;font-size:14px;border:1px solid}
+.aviso.info{background:var(--azul-t);border-color:var(--azul);color:var(--azul-osc)}
+.aviso.demo{background:var(--naranja-t);border-color:var(--naranja);color:var(--naranja-txt);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:14px 16px;border-top:4px solid var(--azul);min-width:0}
+.kpi.alerta{border-top-color:var(--naranja)}
+.kpi .et{font-size:12px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.kpi .et .ic{color:var(--azul);margin-right:6px}
+.kpi.alerta .et .ic{color:var(--naranja)}
+.kpi .val{font-size:23px;font-weight:700;color:var(--azul-osc);line-height:1.2;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi.alerta .val{color:var(--naranja-txt)}
+.kpi .det{font-size:12.5px;color:var(--texto-2);margin-top:2px;overflow-wrap:anywhere}
+.panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:16px;margin-bottom:16px}
+.panel h2{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--azul-osc)}
+.panel h2 .ic{color:var(--naranja)}
+.panel .nota{margin:0 0 10px;font-size:12.5px;color:var(--texto-2)}
+.filtros{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+.filtros .busca{grid-column:span 2}
+.filtros label{display:block;font-size:12.5px;font-weight:600;color:var(--texto-2);margin-bottom:4px}
+.filtros input[type=search],.filtros select{width:100%;padding:9px 10px;border:1px solid #B7BEC6;border-radius:8px;font:inherit;color:var(--texto);background:#fff;min-height:40px}
+.filtros input:focus,.filtros select:focus,.btn:focus-visible,th button:focus-visible,.chip:focus-visible,.pag button:focus-visible,.seg:focus-visible{outline:3px solid var(--azul);outline-offset:1px}
+.fila2{display:flex;gap:18px;align-items:center;flex-wrap:wrap;grid-column:1/-1}
+.fila2 .esp{flex:1}
+.alcance{display:flex;flex-wrap:wrap;margin:10px 0 12px}
+.seg{flex:1 1 240px;font:inherit;font-size:15px;font-weight:700;padding:13px 16px;border:2px solid var(--azul-osc);background:#fff;color:var(--azul-osc);cursor:pointer;min-height:48px}
+.seg+.seg{margin-left:-2px}
+.seg:first-child{border-radius:var(--radio) 0 0 var(--radio)}
+.seg:last-child{border-radius:0 var(--radio) var(--radio) 0}
+.seg[aria-pressed="true"]{background:var(--azul-osc);color:#fff;box-shadow:inset 0 -4px 0 var(--naranja)}
+.seg span{font-weight:400;opacity:.85;margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 4px}
+.chip{font:inherit;font-size:13.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1.5px solid var(--azul);background:#fff;color:var(--azul-osc);cursor:pointer;min-height:36px}
+.chip:hover{background:var(--azul-t)}
+.chip[aria-pressed="true"]{background:var(--azul);color:#fff}
+.chip span{font-weight:500;opacity:.9;margin-left:4px;font-variant-numeric:tabular-nums}
+.btn{display:inline-block;padding:8px 14px;border-radius:8px;border:1px solid var(--azul);background:#fff;color:var(--azul);font:inherit;font-weight:600;font-size:14px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--azul-t)}
+.btn.pri{background:var(--azul);color:#fff}
+.btn.pri:hover{background:var(--azul-osc);border-color:var(--azul-osc)}
+.btn.sm{padding:4px 10px;font-size:12.5px;margin-top:6px}
+.tabla-cab{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.tabla-cab h2{margin:0}
+.tabla-cab .cuenta{font-size:13px;color:var(--texto-2)}
+.scroll{overflow-x:auto;border:1px solid var(--borde);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:1180px;table-layout:fixed;background:#fff}
+td{overflow-wrap:break-word}
+th,td{padding:10px 9px;text-align:left;vertical-align:top;border-bottom:1px solid #E6E8EB;font-size:13.5px}
+th{background:var(--gris-t);position:sticky;top:0;white-space:normal;font-size:12.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--azul-osc)}
+th button{all:unset;cursor:pointer;font-weight:700;text-transform:inherit;letter-spacing:inherit;display:inline-flex;gap:4px;align-items:center;border-radius:4px;padding:2px 4px}
+th button .fl{opacity:.35;font-size:11px}
+th[aria-sort] button .fl{opacity:1;color:var(--naranja)}
+tbody tr:hover{background:#FAFBFD}
+td .cierre{display:block;font-size:12.5px;color:var(--texto-2);margin-top:3px}
+td .id{font-weight:700;white-space:nowrap}
+td .nombre{font-weight:600}
+td .tipo{display:block;font-size:12px;color:var(--texto-2);margin-top:2px}
+td .org{font-weight:600}
+td .uni{display:block;font-size:12.5px;color:var(--texto-2)}
+td .desc{display:block;font-size:12.5px;color:var(--texto-2);margin-top:3px}
+details.dd{margin-top:3px;font-size:12.5px;color:var(--texto-2)}
+details.dd summary{cursor:pointer;list-style:none}
+details.dd summary::-webkit-details-marker{display:none}
+details.dd summary::after{content:" ver más";color:var(--azul);font-weight:600;white-space:nowrap}
+details.dd[open] summary{display:none}
+details.dd div{white-space:pre-line}
+details.dd .menos{display:block;color:var(--azul);font-weight:600;cursor:pointer;margin-top:3px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:12.5px;border:1px solid transparent;white-space:nowrap}
+.badge.adj{background:var(--azul-t);color:var(--azul-osc);border-color:var(--azul);border-left-width:5px}
+.badge.des{background:var(--gris-t);color:var(--azul-osc);border-color:#9AA5B1}
+.badge.rev{background:var(--naranja-t);color:var(--naranja-txt);border-color:var(--naranja);border-left-width:5px}
+.badge.sus{background:var(--naranja-t);color:var(--naranja-txt)}
+.badge.cer{background:#fff;color:var(--azul-osc);border-color:var(--gris)}
+.est-det{display:block;font-size:12px;color:var(--texto-2);margin-top:4px}
+.etq{display:inline-block;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:5px;background:var(--azul-t);color:var(--azul-osc);margin:3px 4px 0 0}
+.etq.lin{background:var(--gris-t);color:var(--azul-osc);border:1px solid var(--gris)}
+.emp{margin-bottom:7px}
+.emp:last-child{margin-bottom:0}
+.emp strong{display:block;font-weight:600}
+.emp small{display:block;font-size:12px;color:var(--texto-2);font-variant-numeric:tabular-nums}
+td.monto{white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums}
+td.monto small{display:block;font-size:12px;color:var(--texto-2);white-space:normal}
+.sinmonto{color:var(--texto-2)}
+.pag{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px;flex-wrap:wrap;font-size:13px;color:var(--texto-2)}
+.pag button{padding:6px 12px;border-radius:8px;border:1px solid var(--azul);background:#fff;color:var(--azul);font:inherit;font-weight:600;cursor:pointer}
+.pag button:disabled{border-color:var(--gris);color:#8A949E;cursor:not-allowed}
+.estado{padding:36px 16px;text-align:center;color:var(--texto-2)}
+.estado strong{display:block;color:var(--azul-osc);font-size:16px;margin-bottom:4px}
+footer{max-width:1280px;margin:0 auto;padding:6px 20px 32px;font-size:12.5px;color:var(--texto-2)}
+footer p{margin:4px 0}
+@media (max-width:1000px){
+  .filtros{grid-template-columns:1fr 1fr}
+  .filtros .busca{grid-column:1/-1}
+}
+@media (max-width:620px){.seg{flex-basis:100%}.seg+.seg{margin-left:0;margin-top:-2px}.seg:first-child{border-radius:var(--radio) var(--radio) 0 0}.seg:last-child{border-radius:0 0 var(--radio) var(--radio)}}
+@media (max-width:760px){
+  main{padding:14px 12px}
+  .cab h1{font-size:21px}
+  .cab .meta{text-align:left}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi .val{font-size:22px}
+  .filtros{grid-template-columns:1fr}
+  .scroll{border:0}
+  table,thead,tbody,tr,td{display:block;min-width:0;width:100%}
+  thead{position:absolute;left:-9999px}
+  tr{background:#fff;border:1px solid var(--borde);border-radius:10px;margin-bottom:10px;padding:6px 0}
+  td{border:0;padding:6px 14px;text-align:left!important}
+  td::before{content:attr(data-et);display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--texto-2)}
+  colgroup{display:none}
+}
+@media print{
+  .filtros,.pag,.btn,.chips,.alcance{display:none!important}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="i-doc" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></g></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></g></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></g></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></g></symbol>
+<symbol id="i-coin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.8 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1 0-2-.5-2.5-1.5"/><path d="M12 6v2M12 16v2"/></g></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></g></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></g></symbol>
+<symbol id="i-hat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16a7 7 0 0 1 14 0"/><path d="M3 16h18v3H3z"/><path d="M12 9v4"/></g></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5"/><path d="M5 20h14"/></g></symbol>
+</defs>
+</svg>
+<header class="cab">
+  <div class="cab-in">
+    <div class="marca">
+      <div>
+        <h1>Seguimiento de licitaciones cerradas · Región de O'Higgins</h1>
+      </div>
+    </div>
+    <div class="meta">
+      <strong id="actualizado">Cargando datos…</strong>
+      Fuente: Mercado Público (Dirección ChileCompra)
+    </div>
+  </div>
+  <nav class="tabs" aria-label="Secciones del panel">
+    <a href="./">Licitaciones vigentes</a>
+    <a href="seguimiento.html" aria-current="page">Seguimiento de cerradas</a>
+  </nav>
+</header>
+
+<main>
+  <div id="avisos"></div>
+
+  <section class="kpis" id="kpis" aria-label="Resumen del seguimiento"></section>
+
+  <section class="panel" aria-label="Filtros">
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-filter"/></svg>Filtros</h2>
+    <div class="alcance" role="group" aria-label="Alcance del análisis">
+      <button type="button" class="seg" id="seg-cons" data-alc="1" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-hat"/></svg>Construcción e infraestructura <span id="n-cons"></span></button>
+      <button type="button" class="seg" id="seg-todas" data-alc="0" aria-pressed="false"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg>Todas las licitaciones <span id="n-todas"></span></button>
+    </div>
+    <p class="nota" style="margin-top:4px">Estado de la licitación</p>
+    <div class="chips" id="chips" role="group" aria-label="Estado de la licitación"></div>
+    <div class="filtros">
+      <div class="busca">
+        <label for="f-q">Buscar (ID, nombre, organismo, comuna, empresa o RUT)</label>
+        <input type="search" id="f-q" placeholder="Ej.: pavimentación, Constructora, 76.111.222-3">
+      </div>
+      <div><label for="f-organismo">Organismo comprador</label><select id="f-organismo"></select></div>
+      <div><label for="f-comuna">Comuna</label><select id="f-comuna"></select></div>
+      <div><label for="f-linea">Línea de negocio</label><select id="f-linea"></select></div>
+      <div><label for="f-periodo">Cerradas en el período</label><select id="f-periodo">
+        <option value="">Todo el historial</option>
+        <option value="7">Últimos 7 días</option>
+        <option value="30">Últimos 30 días</option>
+        <option value="90">Últimos 90 días</option>
+      </select></div>
+      <div class="fila2">
+        <span class="esp"></span>
+        <button type="button" class="btn" id="limpiar">Limpiar filtros</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="tabla-sec" aria-label="Listado de licitaciones cerradas">
+    <div class="tabla-cab">
+      <div>
+        <h2><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Licitaciones cerradas</h2>
+        <span class="cuenta" id="cuenta" aria-live="polite"></span>
+      </div>
+      <button type="button" class="btn pri" id="exportar"><svg class="ic" aria-hidden="true" style="margin-right:6px"><use href="#i-down"/></svg>Descargar CSV</button>
+    </div>
+    <div class="scroll">
+      <table>
+        <colgroup><col style="width:9%"><col style="width:12%"><col style="width:24%"><col style="width:15%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>
+        <thead><tr id="cabecera"></tr></thead>
+        <tbody id="cuerpo"></tbody>
+      </table>
+    </div>
+    <div id="estado"></div>
+    <div class="pag" id="pag"></div>
+  </section>
+</main>
+
+<footer>
+  <p id="pie-datos"></p>
+  <p><strong>Cómo se construye esta hoja:</strong> cuando una licitación de la región deja de estar activa en Mercado Público, el panel la pasa a esta lista y consulta periódicamente su estado: cada 2 días durante las dos primeras semanas tras el cierre, luego cada 7 días hasta los 60 días y cada 14 días hasta los 150 días. El resultado (adjudicada, desierta, revocada) y la empresa adjudicada los informa el organismo comprador, y pueden demorar semanas en aparecer. Una licitación «Cerrada» es una que aún no informa resultado.</p>
+  <p>Los montos adjudicados son la suma de cantidad por monto unitario adjudicado por ítem que informa la API, en la moneda de la licitación (pesos cuando no se informa otra). Para licitaciones adjudicadas a varias empresas se muestra el detalle por empresa. «Línea de negocio» y «Afín a construcción» son clasificaciones referenciales, no datos oficiales de ChileCompra. Antes de decidir, revise siempre la ficha y el acta oficial en Mercado Público.</p>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var TZ='America/Santiago', DIA=86400000, POR_PAGINA=25;
+var $=function(s){return document.querySelector(s);};
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['’`]/g,'').toLowerCase().replace(/\s+/g,' ').trim();}
+function ahoraCL(){var s=new Date().toLocaleString('sv-SE',{timeZone:TZ});return Date.parse(s.replace(' ','T')+'Z');}
+function aMs(s){if(!s)return null;var t=Date.parse(String(s).slice(0,19)+'Z');return isNaN(t)?null:t;}
+function fmtFecha(s){var m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(s||'');return m?m[3]+'-'+m[2]+'-'+m[1]+' '+m[4]+':'+m[5]:'—';}
+function fmtDia(s){var m=/^(\d{4})-(\d{2})-(\d{2})/.exec(s||'');return m?m[3]+'-'+m[2]+'-'+m[1]:'—';}
+var nf=new Intl.NumberFormat('es-CL');
+function esCLPmon(mon){return !mon||/^(CLP|PESO)/i.test(String(mon));}
+function fmtPlata(m,mon){
+  if(m==null)return '<span class="sinmonto">No informado</span>';
+  if(esCLPmon(mon))return '$\u00a0'+nf.format(Math.round(m));
+  return nf.format(m)+'\u00a0'+esc(String(mon).toUpperCase());
+}
+function fmtPlataTxt(m,mon){return m==null?'':(esCLPmon(mon)?'$\u00a0'+nf.format(Math.round(m)):nf.format(m)+'\u00a0'+String(mon).toUpperCase());}
+function fmtMM(v){return v>=1e6?'$ '+nf.format(Math.round(v/1e6))+' MM':'$ '+nf.format(Math.round(v/1e3))+' mil';}
+
+var COMUNAS=['Rancagua','Codegua','Coinco','Coltauco','Doñihue','Graneros','Las Cabras','Machalí','Malloa','Mostazal','Olivar','Peumo','Pichidegua','Quinta de Tilcoco','Rengo','Requínoa','San Vicente','Pichilemu','La Estrella','Litueche','Marchihue','Navidad','Paredones','San Fernando','Chépica','Chimbarongo','Lolol','Nancagua','Palmilla','Peralillo','Placilla','Pumanque','Santa Cruz'];
+var COM={}; COMUNAS.forEach(function(c){COM[norm(c)]=c;});
+function comunaCanon(raw){var k=norm(raw);if(!k)return '';return COM[k]||String(raw).trim();}
+
+var LINEAS=['Obras','Materiales y suministros','Maquinaria y equipos','Estudios y servicios técnicos'];
+var ESTADOS=['Adjudicada','Desierta','Revocada','Suspendida','Cerrada'];
+var ETQ_ESTADO={Adjudicada:'Adjudicada',Desierta:'Desierta',Revocada:'Revocada',Suspendida:'Suspendida',Cerrada:'Cerrada, sin resultado aún'};
+var CLS_ESTADO={Adjudicada:'adj',Desierta:'des',Revocada:'rev',Suspendida:'sus',Cerrada:'cer'};
+var MOTIVOS={
+  codigo:'Clasificada como construcción por el código de rubro de Mercado Público',
+  nombre:'Clasificada como construcción por el nombre o el rubro de la licitación',
+  organismo:'Clasificada como construcción por el organismo comprador (obras públicas)',
+  descripcion:'Clasificada como construcción por el contexto de la descripción de la licitación'
+};
+
+var filas=[], datos=null, pagina=1;
+var F0={q:'',organismo:'',comuna:'',linea:'',periodo:'',estado:'',afin:true};
+var F=Object.assign({},F0);
+var orden={col:'cierre',dir:-1};
+var COLS=[{k:'cierre',t:'Cierre'},{k:'id',t:'ID'},{k:'nombre',t:'Licitación'},{k:'organismo',t:'Organismo'},{k:'estado',t:'Estado'},{k:'empresa',t:'Empresa adjudicada'},{k:'monto',t:'Monto adjudicado'}];
+
+function urlSegura(l){
+  var u=String(l.url||'');
+  return /^https:\/\/www\.mercadopublico\.cl\//.test(u)?u:'https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion='+encodeURIComponent(l.id);
+}
+function urlActa(a){var u=a&&a.acta?String(a.acta):'';return /^https?:\/\//i.test(u)?u:'';}
+
+function prepararFilas(lics){
+  var ahora=ahoraCL(), out=[];
+  lics.forEach(function(l){
+    var ms=aMs(l.cierre), adj=l.adj||null, emp=(adj&&adj.empresas)||[];
+    var comuna=comunaCanon(l.comuna);
+    var clpAdj=adj&&adj.monto!=null&&esCLPmon(l.moneda)?adj.monto:null;
+    out.push({
+      l:l, ms:ms==null?0:ms, dias:ms==null?99999:Math.max(0,Math.floor((ahora-ms)/DIA)),
+      estado:ESTADOS.indexOf(l.estado)>=0?l.estado:'Cerrada',
+      comuna:comuna, emp:emp, adj:adj, clpAdj:clpAdj,
+      empTxt:emp.map(function(e){return e.nombre;}).join(' | '),
+      texto:norm([l.id,l.nombre,l.descripcion,l.organismo,l.unidad,comuna,l.sector,emp.map(function(e){return e.nombre+' '+e.rut;}).join(' ')].join(' '))
+    });
+  });
+  return out;
+}
+
+function pasa(f,omitir){
+  var l=f.l;
+  if(F.q){var ts=norm(F.q).split(' ').filter(Boolean);for(var i=0;i<ts.length;i++){if(f.texto.indexOf(ts[i])<0)return false;}}
+  if(omitir!=='organismo' && F.organismo && l.organismo!==F.organismo)return false;
+  if(omitir!=='comuna' && F.comuna && f.comuna!==F.comuna)return false;
+  if(omitir!=='linea' && F.linea && l.linea!==F.linea)return false;
+  if(omitir!=='periodo' && F.periodo && f.dias>parseInt(F.periodo,10))return false;
+  if(omitir!=='estado' && F.estado && f.estado!==F.estado)return false;
+  if(F.afin && !l.afin)return false;
+  return true;
+}
+function filtradas(omitir){return filas.filter(function(f){return pasa(f,omitir);});}
+
+function cmp(a,b){
+  var c=orden.col, r;
+  if(c==='cierre')r=a.ms-b.ms;
+  else if(c==='monto'){
+    if(a.clpAdj==null&&b.clpAdj==null)r=0;
+    else if(a.clpAdj==null)return 1;
+    else if(b.clpAdj==null)return -1;
+    else r=a.clpAdj-b.clpAdj;
+  }
+  else {
+    var u=(c==='empresa'?a.empTxt:c==='estado'?a.estado:a.l[c])||'', v=(c==='empresa'?b.empTxt:c==='estado'?b.estado:b.l[c])||'';
+    r=u.localeCompare(v,'es');
+  }
+  return r*orden.dir||a.l.id.localeCompare(b.l.id);
+}
+
+function contar(arr,fn){var m={};arr.forEach(function(x){var k=fn(x);if(k)m[k]=(m[k]||0)+1;});return m;}
+function ordenar(m){return Object.keys(m).sort(function(a,b){return m[b]-m[a]||a.localeCompare(b,'es');});}
+function llenarSelect(id,etiqueta,valores){
+  var sel=$(id), act=sel.value;
+  var html='<option value="">'+esc(etiqueta)+'</option>';
+  valores.forEach(function(v){html+='<option value="'+esc(v[0])+'">'+esc(v[1])+'</option>';});
+  sel.innerHTML=html; sel.value=act;
+}
+function prepararFiltros(){
+  var base=filas.filter(function(f){return !F.afin||f.l.afin;});
+  var o=contar(base,function(f){return f.l.organismo;}), c=contar(base,function(f){return f.comuna;}), li=contar(base,function(f){return f.l.linea;});
+  llenarSelect('#f-organismo','Todos los organismos',ordenar(o).map(function(k){return [k,k+' ('+o[k]+')'];}));
+  llenarSelect('#f-comuna','Todas las comunas',ordenar(c).map(function(k){return [k,k+' ('+c[k]+')'];}));
+  llenarSelect('#f-linea','Todas las líneas',LINEAS.filter(function(k){return li[k];}).map(function(k){return [k,k+' ('+li[k]+')'];}));
+}
+
+function chips(){
+  var base=filtradas('estado'), cn=contar(base,function(f){return f.estado;});
+  var h='<button type="button" class="chip" data-estado="" aria-pressed="'+(F.estado===''?'true':'false')+'">Todos <span>'+nf.format(base.length)+'</span></button>';
+  ESTADOS.forEach(function(e){
+    h+='<button type="button" class="chip" data-estado="'+e+'" aria-pressed="'+(F.estado===e?'true':'false')+'">'+esc(ETQ_ESTADO[e])+' <span>'+nf.format(cn[e]||0)+'</span></button>';
+  });
+  $('#chips').innerHTML=h;
+}
+
+function kpis(arr){
+  var cn=contar(arr,function(f){return f.estado;});
+  var adj=arr.filter(function(f){return f.estado==='Adjudicada';});
+  var conM=adj.filter(function(f){return f.clpAdj!=null;});
+  var suma=conM.reduce(function(a,f){return a+f.clpAdj;},0);
+  var conE=adj.filter(function(f){return f.emp.length;}).length;
+  var pend=(cn.Cerrada||0)+(cn.Suspendida||0);
+  $('#kpis').innerHTML=
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Cerradas en seguimiento</div><div class="val">'+nf.format(arr.length)+'</div><div class="det">'+(arr.length===filas.length?'Todas las registradas':'de '+nf.format(filas.length)+' registradas')+'</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Adjudicadas</div><div class="val">'+nf.format(cn.Adjudicada||0)+'</div><div class="det">'+nf.format(conE)+' con empresa informada</div></div>'+
+    '<div class="kpi alerta"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-warn"/></svg>Desiertas o revocadas</div><div class="val">'+nf.format((cn.Desierta||0)+(cn.Revocada||0))+'</div><div class="det">'+nf.format(cn.Desierta||0)+' desiertas · '+nf.format(cn.Revocada||0)+' revocadas</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Sin resultado aún</div><div class="val">'+nf.format(pend)+'</div><div class="det">Cerradas o suspendidas</div></div>'+
+    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-coin"/></svg>Monto adjudicado (CLP)</div><div class="val">'+(conM.length?fmtMM(suma):'—')+'</div><div class="det">'+nf.format(conM.length)+' de '+nf.format(adj.length)+' adjudicadas informan monto</div></div>';
+}
+
+function cabecera(){
+  $('#cabecera').innerHTML=COLS.map(function(c){
+    var act=orden.col===c.k, flecha=act?(orden.dir===1?'▲':'▼'):'↕';
+    return '<th scope="col"'+(act?' aria-sort="'+(orden.dir===1?'ascending':'descending')+'"':'')+'><button type="button" data-ord="'+c.k+'">'+esc(c.t)+' <span class="fl" aria-hidden="true">'+flecha+'</span></button></th>';
+  }).join('');
+}
+
+function descripcionHtml(l){
+  var d=String(l.descripcion||'').trim();
+  if(!d||d===l.nombre)return '';
+  if(d.length<=150)return '<span class="desc">'+esc(d)+'</span>';
+  return '<details class="dd"><summary>'+esc(d.slice(0,150))+'…</summary><div>'+esc(d)+'</div></details>';
+}
+function estadoHtml(f){
+  var l=f.l, a=f.adj, det='';
+  if(f.estado==='Adjudicada'){
+    var p=[];
+    if(a&&a.fecha)p.push('Adjudicada el '+esc(fmtDia(a.fecha)));
+    if(a&&a.oferentes!=null)p.push(nf.format(a.oferentes)+' oferente'+(a.oferentes===1?'':'s'));
+    det=p.join(' · ');
+    if(urlActa(a))det+=(det?' · ':'')+'<a href="'+esc(urlActa(a))+'" target="_blank" rel="noopener noreferrer">Acta ↗</a>';
+  } else if(f.estado==='Cerrada'){
+    det=l.sin_resultado?'Sin resultado informado tras 150 días':'Sin resultado informado aún';
+  } else {
+    det='Detectado el '+esc(fmtDia(l.estado_desde));
+  }
+  return '<span class="badge '+CLS_ESTADO[f.estado]+'">'+esc(f.estado)+'</span>'+(det?'<span class="est-det">'+det+'</span>':'');
+}
+function empresaHtml(f){
+  if(f.estado!=='Adjudicada')return '<span class="sinmonto">—</span>';
+  if(!f.emp.length)return '<span class="sinmonto">Aún no informada</span>';
+  var mon=f.l.moneda, h=f.emp.slice(0,3).map(function(e){
+    return '<div class="emp"><strong>'+esc(e.nombre||'—')+'</strong><small>'+esc(e.rut||'')+(f.emp.length>1&&e.monto?(e.rut?' · ':'')+esc(fmtPlataTxt(e.monto,mon)):'')+'</small></div>';
+  }).join('');
+  if(f.emp.length>3)h+='<small class="sinmonto">+'+(f.emp.length-3)+' empresas más</small>';
+  return h;
+}
+function montoHtml(f){
+  var l=f.l, a=f.adj;
+  var est=l.monto!=null?'<small>Estimado: '+esc(fmtPlataTxt(l.monto,l.moneda))+'</small>':'';
+  if(f.estado!=='Adjudicada')return '<span class="sinmonto">—</span>'+est;
+  if(!a||a.monto==null)return '<span class="sinmonto">No informado</span>'+est;
+  return fmtPlata(a.monto,l.moneda)+est;
+}
+
+function tabla(arr){
+  var total=arr.length, paginas=Math.max(1,Math.ceil(total/POR_PAGINA));
+  if(pagina>paginas)pagina=paginas;
+  var ini=(pagina-1)*POR_PAGINA, vis=arr.slice(ini,ini+POR_PAGINA);
+  $('#cuenta').textContent=total?('Mostrando '+(ini+1)+'–'+(ini+vis.length)+' de '+nf.format(total)):'Sin resultados';
+  $('#cuerpo').innerHTML=vis.map(function(f){
+    var l=f.l, u=urlSegura(l);
+    return '<tr>'+
+      '<td data-et="Cierre"><strong>'+esc(fmtDia(l.cierre))+'</strong><span class="cierre">'+esc((l.cierre||'').slice(11,16))+'</span></td>'+
+      '<td data-et="ID"><a class="id" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(l.id)+'</a><br><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Mercado Público ↗</a></td>'+
+      '<td data-et="Licitación"><span class="nombre">'+esc(l.nombre)+'</span>'+descripcionHtml(l)+
+        (l.tipo_nombre?'<span class="tipo">'+esc(l.tipo_nombre)+'</span>':'')+
+        (l.afin?'<span class="etq" title="'+esc(MOTIVOS[l.afin_motivo]||'Clasificación referencial')+'">Afín a construcción</span>':'')+(l.afin&&l.linea?'<span class="etq lin">'+esc(l.linea)+'</span>':'')+'</td>'+
+      '<td data-et="Organismo comprador"><span class="org">'+esc(l.organismo)+'</span>'+(l.unidad?'<span class="uni">'+esc(l.unidad)+'</span>':'')+'<span class="uni">'+esc(f.comuna||'Comuna no informada')+'</span></td>'+
+      '<td data-et="Estado">'+estadoHtml(f)+'</td>'+
+      '<td data-et="Empresa adjudicada">'+empresaHtml(f)+'</td>'+
+      '<td class="monto" data-et="Monto adjudicado">'+montoHtml(f)+'</td>'+
+    '</tr>';
+  }).join('');
+  var est=$('#estado');
+  if(!filas.length){
+    est.innerHTML='<div class="estado"><strong>Todavía no hay licitaciones cerradas en seguimiento</strong>Aparecerán a medida que las licitaciones de la región cierren y el panel registre su resultado.</div>';
+  } else if(!total){
+    est.innerHTML='<div class="estado"><strong>No hay licitaciones con estos filtros</strong>Pruebe quitando algún filtro o use «Limpiar filtros».</div>';
+  } else est.innerHTML='';
+  $('#pag').innerHTML=total>POR_PAGINA?
+    '<button type="button" id="p-ant"'+(pagina<=1?' disabled':'')+'>← Anterior</button><span>Página '+pagina+' de '+paginas+'</span><button type="button" id="p-sig"'+(pagina>=paginas?' disabled':'')+'>Siguiente →</button>':'';
+}
+
+function render(){
+  var arr=filtradas().sort(cmp);
+  kpis(arr); chips(); cabecera(); tabla(arr);
+}
+
+function exportarCSV(){
+  var arr=filtradas().sort(cmp);
+  var cab=['ID','Licitación','Descripción','Organismo','Unidad compradora','Comuna','Sector','Línea de negocio','Tipo','Fecha de publicación','Fecha de cierre','Estado','Estado detectado el','Fecha de adjudicación','Oferentes','Empresa(s) adjudicada(s)','RUT','Monto adjudicado','Moneda','Monto estimado','Link ficha','Link acta'];
+  function q(v){v=String(v==null?'':v);return '"'+v.replace(/"/g,'""')+'"';}
+  var lin=[cab.map(q).join(';')];
+  arr.forEach(function(f){var l=f.l,a=f.adj||{};
+    lin.push([l.id,l.nombre,l.descripcion||'',l.organismo,l.unidad,f.comuna,l.sector,l.linea||'',l.tipo_nombre||'',fmtFecha(l.publicacion),fmtFecha(l.cierre),f.estado,fmtDia(l.estado_desde),a.fecha?fmtDia(a.fecha):'',a.oferentes==null?'':a.oferentes,
+      f.emp.map(function(e){return e.nombre;}).join(' | '),f.emp.map(function(e){return e.rut;}).join(' | '),a.monto==null?'':a.monto,a.monto==null?'':(l.moneda||'CLP'),l.monto==null?'':l.monto,urlSegura(l),urlActa(a)].map(q).join(';'));
+  });
+  var blob=new Blob(['\uFEFF'+lin.join('\r\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a'), hoy=new Date().toISOString().slice(0,10);
+  a.href=URL.createObjectURL(blob); a.download='seguimiento_licitaciones_ohiggins_'+hoy+'.csv';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href);},2000);
+}
+
+function sincAlcance(){
+  $('#seg-cons').setAttribute('aria-pressed',F.afin?'true':'false');
+  $('#seg-todas').setAttribute('aria-pressed',F.afin?'false':'true');
+}
+function contarAlcance(){
+  $('#n-cons').textContent='('+nf.format(filas.filter(function(f){return f.l.afin;}).length)+')';
+  $('#n-todas').textContent='('+nf.format(filas.length)+')';
+}
+
+function ligar(){
+  var map={'#f-organismo':'organismo','#f-comuna':'comuna','#f-linea':'linea','#f-periodo':'periodo'};
+  Object.keys(map).forEach(function(id){$(id).addEventListener('change',function(e){F[map[id]]=e.target.value;pagina=1;render();});});
+  var t; $('#f-q').addEventListener('input',function(e){clearTimeout(t);var v=e.target.value;t=setTimeout(function(){F.q=v;pagina=1;render();},180);});
+  document.querySelectorAll('.seg').forEach(function(b){b.addEventListener('click',function(){F.afin=b.getAttribute('data-alc')==='1';sincAlcance();prepararFiltros();pagina=1;render();});});
+  $('#limpiar').addEventListener('click',function(){
+    F=Object.assign({},F0);
+    $('#f-q').value='';sincAlcance();prepararFiltros();Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
+  });
+  $('#exportar').addEventListener('click',exportarCSV);
+  document.addEventListener('click',function(e){
+    var ch=e.target.closest&&e.target.closest('[data-estado]');
+    if(ch){F.estado=ch.getAttribute('data-estado');pagina=1;render();return;}
+    var o=e.target.closest&&e.target.closest('[data-ord]');
+    if(o){var c=o.getAttribute('data-ord');if(orden.col===c)orden.dir=-orden.dir;else{orden.col=c;orden.dir=(c==='cierre'||c==='monto')?-1:1;}pagina=1;render();return;}
+    if(e.target.id==='p-ant'){pagina--;render();$('#cuenta').scrollIntoView({block:'center'});}
+    if(e.target.id==='p-sig'){pagina++;render();$('#cuenta').scrollIntoView({block:'center'});}
+  });
+}
+
+function iniciar(d){
+  datos=d; filas=prepararFilas(d.licitaciones||[]);
+  $('#actualizado').textContent='Actualizado: '+(d.generado_texto||'—')+' (hora de Chile)';
+  $('#avisos').innerHTML='<div class="aviso info" role="note">Aquí se sigue lo que ocurre con las licitaciones de la región <strong>después de su cierre</strong>: si fueron adjudicadas, declaradas desiertas o revocadas, y a qué empresa y por qué monto. Incluye las licitaciones que el panel registró desde el <strong>'+esc(fmtDia(d.desde))+'</strong>; el resultado lo informa el organismo comprador y puede demorar semanas.</div>';
+  $('#pie-datos').textContent='Licitaciones en seguimiento: '+nf.format(filas.length)+'.';
+  prepararFiltros(); contarAlcance(); sincAlcance(); ligar(); render();
+}
+
+fetch('cerradas.json?v='+Date.now(),{cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+  .then(iniciar)
+  .catch(function(e){
+    $('#actualizado').textContent='Sin datos';
+    $('#avisos').innerHTML='<div class="aviso info" role="alert">Todavía no hay datos de seguimiento ('+esc(e.message)+'). Aparecerán después de la próxima actualización automática del panel.</div>';
+    cabecera(); kpis([]); chips();
+  });
+})();
+</script>
+</body>
+</html>
