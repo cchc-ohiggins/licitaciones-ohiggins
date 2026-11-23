@@ -235,7 +235,7 @@ footer p{margin:4px 0}
 <footer>
   <p id="pie-datos"></p>
   <p><strong>Cómo se construye esta hoja:</strong> cuando una licitación de la región deja de estar activa en Mercado Público, el panel la pasa a esta lista y consulta periódicamente su estado: cada 2 días durante las dos primeras semanas tras el cierre, luego cada 7 días hasta los 60 días y cada 14 días hasta los 150 días. El resultado (adjudicada, desierta, revocada) y la empresa adjudicada los informa el organismo comprador, y pueden demorar semanas en aparecer. Una licitación «Cerrada» es una que aún no informa resultado.</p>
-  <p>Los montos adjudicados son la suma de cantidad por monto unitario adjudicado por ítem que informa la API, en la moneda de la licitación (pesos cuando no se informa otra). Para licitaciones adjudicadas a varias empresas se muestra el detalle por empresa. «Línea de negocio» y «Afín a construcción» son clasificaciones referenciales, no datos oficiales de ChileCompra. Antes de decidir, revise siempre la ficha y el acta oficial en Mercado Público.</p>
+  <p>Los montos adjudicados son la suma de cantidad por monto unitario adjudicado por ítem que informa la API, en la moneda de la licitación (pesos cuando no se informa otra). Para licitaciones adjudicadas a varias empresas se muestra el detalle por empresa. «Línea de negocio» y «Afín a construcción» son clasificaciones referenciales, no datos oficiales de ChileCompra. Antes de decidir, revise siempre la ficha y el acta oficial en Mercado Público. Si un enlace de «Acta» no abre, entre por «Mercado Público ↗» y busque el acta de adjudicación en la ficha de la licitación.</p>
 </footer>
 
 <script>
@@ -284,7 +284,16 @@ function urlSegura(l){
   var u=String(l.url||'');
   return /^https:\/\/www\.mercadopublico\.cl\//.test(u)?u:'https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idlicitacion='+encodeURIComponent(l.id);
 }
-function urlActa(a){var u=a&&a.acta?String(a.acta):'';return /^https?:\/\//i.test(u)?u:'';}
+function urlActa(a){
+  // La API entrega el código del acta (qs=...) en base64 sin codificar: contiene «+», «/» y «=».
+  // Si el «+» viaja tal cual, Mercado Público lo lee como espacio y el acta no abre; se codifica aquí.
+  var u=a&&a.acta?String(a.acta).trim():'';
+  if(!/^https?:\/\//i.test(u))return '';
+  u=u.replace(/^http:\/\//i,'https://');
+  var i=u.indexOf('?qs=');
+  if(i>=0){var v=u.slice(i+4);if(v.indexOf('%')<0)u=u.slice(0,i+4)+encodeURIComponent(v);}
+  return u;
+}
 
 function prepararFilas(lics){
   var ahora=ahoraCL(), out=[];
