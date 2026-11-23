@@ -2,18 +2,26 @@ name: Actualizar panel de licitaciones
 
 on:
   schedule:
-    # Cuatro veces al dia (hora UTC). En Chile en horario de verano (UTC-3) equivalen a
-    # ~07:07, ~10:47, ~13:47 y ~18:07. Se usan minutos poco comunes porque GitHub atrasa mas
-    # las ejecuciones programadas en horas redondas (en punto y y media), que son las mas usadas.
+    # Ocho disparos al dia (hora UTC): cuatro principales y cuatro de respaldo, unos 55 minutos
+    # despues de cada uno. GitHub atrasa o se salta a veces las ejecuciones programadas; el
+    # respaldo cubre ese caso. Si el principal si corrio, el respaldo se salta solo (ver el
+    # trabajo "revisar"). En Chile en horario de verano (UTC-3) equivalen a:
+    #   principales: ~07:07, ~10:47, ~13:47, ~18:07
+    #   respaldos:   ~08:02, ~11:42, ~14:42, ~19:02
+    # Se usan minutos poco comunes porque GitHub atrasa mas las horas redondas (en punto y y media).
     - cron: "7 10 * * *"
+    - cron: "2 11 * * *"
     - cron: "47 13 * * *"
+    - cron: "42 14 * * *"
     - cron: "47 16 * * *"
+    - cron: "42 17 * * *"
     - cron: "7 21 * * *"
-  workflow_dispatch:   # permite lanzarlo a mano desde la pestana Actions
+    - cron: "2 22 * * *"
+  workflow_dispatch:   # permite lanzarlo a mano desde la pestaña Actions
 
 permissions:
   contents: write      # guardar data/cache.json y docs/data.json
-  pages: write         # publicar la pagina
+  pages: write         # publicar la página
   id-token: write
 
 concurrency:
@@ -21,7 +29,42 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Evita actualizaciones duplicadas: en una ejecucion programada, si el panel ya se actualizo
+  # hace menos de 90 minutos, no se hace nada (no se gasta cupo de la API). Las ejecuciones
+  # manuales (boton "Run workflow") siempre actualizan.
+  revisar:
+    runs-on: ubuntu-latest
+    outputs:
+      saltar: ${{ steps.chequeo.outputs.saltar }}
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Revisar cuando se actualizo por ultima vez
+        id: chequeo
+        env:
+          EVENTO: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, os, sys
+          from datetime import datetime, timezone
+          saltar = "false"
+          if os.environ.get("EVENTO") == "schedule":
+              try:
+                  with open("docs/data.json", encoding="utf-8") as f:
+                      generado = json.load(f)["generado"]
+                  minutos = (datetime.now(timezone.utc) - datetime.fromisoformat(generado)).total_seconds() / 60
+                  print("Ultima actualizacion hace %.0f minutos" % minutos, file=sys.stderr)
+                  if minutos < 90:
+                      saltar = "true"
+              except Exception as e:
+                  print("No se pudo leer la ultima actualizacion (%s); se actualiza igual." % e, file=sys.stderr)
+          print("saltar=" + saltar)
+          PY
+
   actualizar:
+    needs: revisar
+    if: needs.revisar.outputs.saltar != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 240
     environment:
@@ -40,7 +83,7 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r requirements.txt
 
-      - name: Consultar Mercado Publico y generar los datos
+      - name: Consultar Mercado Público y generar los datos
         env:
           MERCADO_PUBLICO_TICKET: ${{ secrets.MERCADO_PUBLICO_TICKET }}
         run: python actualizar_licitaciones.py
@@ -53,18 +96,18 @@ jobs:
           if git diff --cached --quiet; then
             echo "Sin cambios que guardar."
           else
-            git commit -m "Actualizacion de datos $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git commit -m "Actualización de datos $(date -u '+%Y-%m-%d %H:%M') UTC"
             git push
           fi
 
-      - name: Configurar la publicacion
+      - name: Configurar la publicación
         uses: actions/configure-pages@v5
 
-      - name: Preparar la pagina
+      - name: Preparar la página
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
-      - name: Publicar la pagina
+      - name: Publicar la página
         id: deployment
         uses: actions/deploy-pages@v4
