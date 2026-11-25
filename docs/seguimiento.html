@@ -11,18 +11,24 @@
   --naranja:#E74100; --azul:#006EDC; --azul-osc:#003D6B; --gris:#D9D9D9;
   --naranja-t:#FFE6DA; --naranja-txt:#8F2700; --azul-t:#E3EFFC; --gris-t:#F1F2F4; --neutro:#7A8896;
   --fondo:#F5F7FA; --tarjeta:#FFFFFF; --texto:#14283C; --texto-2:#4B5B6B; --borde:#D9D9D9;
-  --radio:10px;
+  --radio:12px;
+  --num:Bahnschrift,"DIN Alternate","Arial Narrow","Segoe UI",system-ui,sans-serif;
+  --sombra:0 1px 2px rgba(0,61,107,.07),0 6px 18px rgba(0,61,107,.07);
 }
 *{box-sizing:border-box}
 html{color-scheme:light}
 body{margin:0;background:var(--fondo);color:var(--texto);
   font-family:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.45}
 a{color:var(--azul)}
-.cab{background:var(--azul-osc);color:#fff;border-bottom:4px solid var(--naranja)}
-.cab-in{max-width:1280px;margin:0 auto;padding:22px 20px;display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
-.cab h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em}
+.cab{position:relative;overflow:hidden;background-color:var(--azul-osc);color:#fff;border-bottom:4px solid var(--naranja);
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.055) 1px,transparent 1px);background-size:28px 28px}
+.cab-fondo{position:absolute;right:max(0px,calc(50% - 640px));bottom:0;width:min(520px,46%);height:100%;pointer-events:none}
+.cab-fondo svg{position:absolute;right:0;bottom:0;width:100%;height:auto;max-height:100%}
+.cab-in,.tabs{position:relative}
+.cab-in{max-width:1280px;margin:0 auto;padding:30px 20px 18px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.cab h1{margin:0;font-family:var(--num);font-size:32px;font-weight:600;letter-spacing:.005em;line-height:1.12}
 .marca{display:flex;align-items:center;gap:16px}
-.cab .meta{text-align:right;font-size:13px;color:#C9DCF0}
+.cab .meta{text-align:left;font-size:13.5px;color:#C9DCF0}
 .cab .meta strong{color:#fff;font-size:15px;display:block}
 .tabs{max-width:1280px;margin:0 auto;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap}
 .tabs a{color:#C9DCF0;text-decoration:none;font-weight:600;font-size:14.5px;padding:10px 18px;border-radius:9px 9px 0 0}
@@ -35,17 +41,17 @@ main{max-width:1280px;margin:0 auto;padding:20px}
 .aviso.info{background:var(--azul-t);border-color:var(--azul);color:var(--azul-osc)}
 .aviso.demo{background:var(--naranja-t);border-color:var(--naranja);color:var(--naranja-txt);font-weight:600}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
-.kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:14px 16px;border-top:4px solid var(--azul);min-width:0}
+.kpi{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:16px;border-top:4px solid var(--azul);min-width:0;box-shadow:var(--sombra)}
 .kpi.alerta{border-top-color:var(--naranja)}
-.kpi .et{font-size:12px;color:var(--texto-2);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
-.kpi .et .ic{color:var(--azul);margin-right:6px}
-.kpi.alerta .et .ic{color:var(--naranja)}
-.kpi .val{font-size:23px;font-weight:700;color:var(--azul-osc);line-height:1.2;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.kpi.alerta .val{color:var(--naranja-txt)}
-.kpi .det{font-size:12.5px;color:var(--texto-2);margin-top:2px;overflow-wrap:anywhere}
-.panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:16px;margin-bottom:16px}
-.panel h2{margin:0 0 4px;font-size:15px;font-weight:700;color:var(--azul-osc)}
-.panel h2 .ic{color:var(--naranja)}
+.kpi .et{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--texto-2);font-weight:600;line-height:1.25}
+.kpi .et .ic{flex:none;width:22px;height:22px;padding:8px;margin:0;box-sizing:content-box;border-radius:11px;background:var(--azul-t);color:var(--azul)}
+.kpi.alerta .et .ic{background:var(--naranja-t);color:var(--naranja)}
+.kpi .val{font-family:var(--num);font-size:36px;font-weight:600;color:var(--azul-osc);line-height:1.1;margin-top:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi.alerta .val{color:var(--naranja)}
+.kpi .det{font-size:13px;color:var(--texto-2);margin-top:4px;overflow-wrap:anywhere}
+.panel{background:var(--tarjeta);border:1px solid var(--borde);border-radius:var(--radio);padding:18px;margin-bottom:16px;box-shadow:var(--sombra)}
+.panel h2{display:flex;align-items:center;gap:10px;margin:0 0 6px;font-family:var(--num);font-size:19px;font-weight:600;letter-spacing:.005em;color:var(--azul-osc)}
+.panel h2 .ic{flex:none;width:24px;height:24px;padding:6px;margin:0;box-sizing:content-box;border-radius:10px;background:var(--azul-t);color:var(--azul)}
 .panel .nota{margin:0 0 10px;font-size:12.5px;color:var(--texto-2)}
 .filtros{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
 .filtros .busca{grid-column:span 2}
@@ -127,10 +133,11 @@ footer p{margin:4px 0}
 @media (max-width:620px){.seg{flex-basis:100%}.seg+.seg{margin-left:0;margin-top:-2px}.seg:first-child{border-radius:var(--radio) var(--radio) 0 0}.seg:last-child{border-radius:0 0 var(--radio) var(--radio)}}
 @media (max-width:760px){
   main{padding:14px 12px}
-  .cab h1{font-size:21px}
-  .cab .meta{text-align:left}
+  .cab h1{font-size:25px}
+  .cab-in{padding:22px 14px 14px}
+  .cab-fondo{opacity:.55;width:70%}
   .kpis{grid-template-columns:1fr 1fr;gap:10px}
-  .kpi .val{font-size:22px}
+  .kpi .val{font-size:28px;margin-top:10px}
   .filtros{grid-template-columns:1fr}
   .scroll{border:0}
   table,thead,tbody,tr,td{display:block;min-width:0;width:100%}
@@ -143,6 +150,59 @@ footer p{margin:4px 0}
 @media print{
   .filtros,.pag,.btn,.chips,.alcance{display:none!important}
   body{background:#fff}
+}
+
+/* ---- Cifras como filtros, íconos de proyecto y movimiento ---- */
+.grua-carro{animation:gruaCarro 14s ease-in-out infinite alternate}
+.grua-carga{transform-origin:470px 30px;animation:gruaBalanceo 3.4s ease-in-out infinite alternate}
+@keyframes gruaCarro{from{transform:translateX(-74px)}to{transform:translateX(52px)}}
+@keyframes gruaBalanceo{from{transform:rotate(-2.2deg)}to{transform:rotate(2.2deg)}}
+.kpi[role="button"]{cursor:pointer;display:flex;flex-direction:column;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+.kpi[role="button"]:hover{transform:translateY(-3px);box-shadow:0 3px 6px rgba(0,61,107,.1),0 14px 28px rgba(0,61,107,.14)}
+.kpi[role="button"]:active{transform:translateY(-1px)}
+.kpi[role="button"]:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+.kpi .et .ic{transition:transform .25s ease,background-color .2s,color .2s}
+.kpi[role="button"]:hover .et .ic{transform:rotate(-7deg) scale(1.1)}
+.kpi .prop{margin-top:auto;padding-top:12px}
+.kpi .prop-b{display:block;height:6px;border-radius:3px;background:var(--gris-t);overflow:hidden}
+.kpi .prop-b i{display:block;height:100%;border-radius:3px;background:var(--azul);min-width:3px;transition:width .75s cubic-bezier(.2,.7,.2,1)}
+.kpi.alerta .prop-b i{background:var(--naranja)}
+.kpi .prop-t{display:block;font-size:12px;color:var(--texto-2);margin-top:5px}
+.kpi-go{display:flex;align-items:center;gap:2px;margin-top:9px;padding-top:8px;border-top:1px dashed #D3DAE2;font-size:12.5px;font-weight:700;color:var(--azul)}
+.kpi-go .ic{width:14px;height:14px;margin:0;transition:transform .18s ease}
+.kpi[role="button"]:hover .kpi-go .ic{transform:translateX(4px)}
+.kpi.alerta .kpi-go{color:var(--naranja-txt)}
+.kpi[aria-pressed="true"]{border-color:var(--azul);background:linear-gradient(180deg,var(--azul-t),#fff 70%);box-shadow:0 0 0 2px var(--azul),var(--sombra)}
+.kpi.alerta[aria-pressed="true"]{border-color:var(--naranja);background:linear-gradient(180deg,var(--naranja-t),#fff 70%);box-shadow:0 0 0 2px var(--naranja),var(--sombra)}
+.kpi[aria-pressed="true"] .et .ic{background:var(--azul);color:#fff}
+.kpi.alerta[aria-pressed="true"] .et .ic{background:var(--naranja);color:#fff}
+.kpi[aria-pressed="true"] .kpi-go{color:var(--azul-osc)}
+.kpis.entra .kpi{animation:kpiEntra .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes kpiEntra{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.activo{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
+.activo:empty{display:none}
+.activo .lbl{font-size:13px;font-weight:600;color:var(--texto-2)}
+.achip{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 12px;border-radius:999px;background:var(--naranja-t);border:1.5px solid var(--naranja);color:var(--naranja-txt);font-size:13px;font-weight:700;animation:chipEntra .3s cubic-bezier(.2,.7,.2,1) both}
+.achip button{font:inherit;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;border:0;background:var(--naranja);color:#fff;cursor:pointer;padding:0;transition:transform .15s}
+.achip button:hover{transform:scale(1.12) rotate(90deg)}
+.achip button:focus-visible{outline:3px solid var(--azul-osc);outline-offset:2px}
+.achip button .ic{width:12px;height:12px;margin:0}
+@keyframes chipEntra{from{opacity:0;transform:translateX(-10px) scale(.9)}to{opacity:1;transform:none}}
+.chip{transition:transform .15s ease,background-color .15s,color .15s}
+.chip:hover{transform:translateY(-2px)}
+td .pico{display:inline-flex;float:left;width:24px;height:24px;margin:0 8px 2px 0;border-radius:7px;background:var(--azul-t);color:var(--azul);align-items:center;justify-content:center;transition:transform .2s,background-color .2s,color .2s}
+td .pico .ic{width:15px;height:15px;margin:0}
+tbody tr:hover .pico{transform:rotate(-8deg) scale(1.12);background:var(--azul);color:#fff}
+tbody.anim tr{animation:filaEntra .4s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*30ms)}
+@keyframes filaEntra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#tabla-sec{scroll-margin-top:12px}
+#tabla-sec.pulso{animation:pulsoTabla 1.3s ease-out 1}
+@keyframes pulsoTabla{0%{box-shadow:0 0 0 0 rgba(231,65,0,.55)}100%{box-shadow:0 0 0 16px rgba(231,65,0,0)}}
+@media (max-width:760px){.kpi-go{font-size:12px}}
+@media (prefers-reduced-motion:reduce){
+  .grua-carro,.grua-carga,.kpis.entra .kpi,tbody.anim tr,.achip,#tabla-sec.pulso{animation:none!important}
+  .kpi,.kpi *,.chip,.pico,.prop-b i{transition:none!important}
+  .kpi[role="button"]:hover,.chip:hover{transform:none}
 }
 </style>
 </head>
@@ -157,10 +217,48 @@ footer p{margin:4px 0}
 <symbol id="i-filter" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></g></symbol>
 <symbol id="i-list" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></g></symbol>
 <symbol id="i-hat" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16a7 7 0 0 1 14 0"/><path d="M3 16h18v3H3z"/><path d="M12 9v4"/></g></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></g></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></g></symbol>
+<symbol id="p-vial" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 3L4 21M15.5 3L20 21"/><path d="M12 4.5v3M12 10.5v3M12 16.5v3"/></g></symbol>
+<symbol id="p-puente" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8h20"/><path d="M4 20c0-6 3.5-12 8-12s8 6 8 12"/><path d="M12 8v12M8 9v10M16 9v10"/></g></symbol>
+<symbol id="p-agua" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5"/></g></symbol>
+<symbol id="p-deporte" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M12 6v12"/><circle cx="12" cy="12" r="2.6"/><path d="M3 10h3v4H3M21 10h-3v4h3"/></g></symbol>
+<symbol id="p-salud" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></g></symbol>
+<symbol id="p-escuela" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path d="M22 9v6"/></g></symbol>
+<symbol id="p-energia" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L5 13h6l-1 9 8-11h-6z"/></g></symbol>
+<symbol id="p-verde" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-6"/><path d="M12 15a5 5 0 0 1-4-8 4.5 4.5 0 0 1 8 0 5 5 0 0 1-4 8z"/><path d="M8 21h8"/></g></symbol>
+<symbol id="p-vivienda" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></g></symbol>
+<symbol id="p-edificio" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="10" height="18" rx="1"/><path d="M15 9h4v12h-4"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/></g></symbol>
+<symbol id="p-tierra" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="15" width="12" height="4.5" rx="2.2"/><path d="M5 15v-4h5l2 4"/><path d="M12 12l5-7 4 3"/><path d="M17 5l-1 6 5 1"/></g></symbol>
+<symbol id="p-materiales" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h11v10H2z"/><path d="M13 9h4l3 3v4h-7"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/></g></symbol>
+<symbol id="p-estudio" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4l16 16z"/><path d="M8 16v-4M8 16h4"/></g></symbol>
+<symbol id="p-obra" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3 17.8 6.2 21l6.3-6.3a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></g></symbol>
 <symbol id="i-down" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5"/><path d="M5 20h14"/></g></symbol>
 </defs>
 </svg>
 <header class="cab">
+  <div class="cab-fondo" aria-hidden="true">
+    <svg viewBox="0 0 560 190" preserveAspectRatio="xMaxYMax meet" focusable="false">
+      <g fill="rgba(255,255,255,.075)">
+        <rect x="30" y="112" width="58" height="78"/><rect x="96" y="82" width="46" height="108"/><rect x="150" y="128" width="70" height="62"/>
+        <rect x="228" y="96" width="52" height="94"/><rect x="288" y="140" width="64" height="50"/>
+      </g>
+      <g stroke="rgba(255,255,255,.12)" stroke-width="2" stroke-dasharray="3 9">
+        <path d="M38 124h42M38 140h42M38 156h42M38 172h42M104 96h30M104 112h30M104 128h30M104 144h30M104 160h30M104 176h30M236 110h36M236 126h36M236 142h36M236 158h36M236 174h36"/>
+      </g>
+      <g fill="none" stroke="#E74100" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".95">
+        <path d="M418 190V30"/><path d="M430 190V30"/>
+        <path d="M418 52l12 -22M418 76l12 -24M418 100l12 -24M418 124l12 -24M418 148l12 -24M418 172l12 -24"/>
+        <path d="M312 30h232"/><path d="M312 30l112 -26l112 26"/>
+        <path d="M312 30v14h26v-14"/>
+      </g>
+      <g fill="#E74100"><rect x="404" y="24" width="38" height="12" rx="2"/></g>
+      <g class="grua-carro"><g class="grua-carga">
+        <path d="M470 30v62" fill="none" stroke="#E74100" stroke-width="3" stroke-linecap="round"/>
+        <rect x="458" y="92" width="24" height="16" rx="2" fill="#E74100"/>
+      </g></g>
+    </svg>
+  </div>
   <div class="cab-in">
     <div class="marca">
       <div>
@@ -220,6 +318,7 @@ footer p{margin:4px 0}
       </div>
       <button type="button" class="btn pri" id="exportar"><svg class="ic" aria-hidden="true" style="margin-right:6px"><use href="#i-down"/></svg>Descargar CSV</button>
     </div>
+    <div class="activo" id="activo" aria-live="polite"></div>
     <div class="scroll">
       <table>
         <colgroup><col style="width:9%"><col style="width:12%"><col style="width:24%"><col style="width:15%"><col style="width:14%"><col style="width:15%"><col style="width:11%"></colgroup>
@@ -235,7 +334,7 @@ footer p{margin:4px 0}
 <footer>
   <p id="pie-datos"></p>
   <p><strong>Cómo se construye esta hoja:</strong> cuando una licitación de la región deja de estar activa en Mercado Público, el panel la pasa a esta lista y consulta periódicamente su estado: cada 2 días durante las dos primeras semanas tras el cierre, luego cada 7 días hasta los 60 días y cada 14 días hasta los 150 días. El resultado (adjudicada, desierta, revocada) y la empresa adjudicada los informa el organismo comprador, y pueden demorar semanas en aparecer. Una licitación «Cerrada» es una que aún no informa resultado.</p>
-  <p>Los montos adjudicados son la suma de cantidad por monto unitario adjudicado por ítem que informa la API, en la moneda de la licitación (pesos cuando no se informa otra). Para licitaciones adjudicadas a varias empresas se muestra el detalle por empresa. «Línea de negocio» y «Afín a construcción» son clasificaciones referenciales, no datos oficiales de ChileCompra. Antes de decidir, revise siempre la ficha y el acta oficial en Mercado Público. Si un enlace de «Acta» no abre, entre por «Mercado Público ↗» y busque el acta de adjudicación en la ficha de la licitación.</p>
+  <p>Los montos adjudicados son la suma de cantidad por monto unitario adjudicado por ítem que informa la API, en la moneda de la licitación (pesos cuando no se informa otra). Para licitaciones adjudicadas a varias empresas se muestra el detalle por empresa. «Línea de negocio», «Afín a construcción» y el ícono de tipo de proyecto son clasificaciones referenciales, no datos oficiales de ChileCompra. Antes de decidir, revise siempre la ficha y el acta oficial en Mercado Público. Si un enlace de «Acta» no abre, entre por «Mercado Público ↗» y busque el acta de adjudicación en la ficha de la licitación.</p>
 </footer>
 
 <script>
@@ -263,6 +362,39 @@ var COMUNAS=['Rancagua','Codegua','Coinco','Coltauco','Doñihue','Graneros','Las
 var COM={}; COMUNAS.forEach(function(c){COM[norm(c)]=c;});
 function comunaCanon(raw){var k=norm(raw);if(!k)return '';return COM[k]||String(raw).trim();}
 
+/* Tipo de proyecto: clasificación referencial por palabras clave. Se mira primero el NOMBRE de la licitación;
+   solo si el nombre no dice nada se mira la descripción y, al final, los rubros. El orden de las reglas importa. */
+var PROYECTOS=[
+  {k:'tierra',t:'Movimiento de tierras',i:'p-tierra',re:/demolicion|excavacion|movimiento de tierra|escombro|retroexcav|excavadora|motoniveladora|maquinaria pesada|extraccion de aridos/},
+  {k:'puente',t:'Puentes y obras fluviales',i:'p-puente',re:/puente|pasarela|viaducto|defensa fluvial|paso a desnivel|muro de contencion/},
+  {k:'vial',t:'Vialidad',i:'p-vial',re:/pavimen|camino|\bruta\b|\brutas\b|vialidad|\bvial\b|calzada|bache|asfalt|vereda|acera|\bcalle\b|\bcalles\b|ciclovia|carretera|senaletica|semaforo|demarcacion|mezcla asfaltica/},
+  {k:'agua',t:'Agua y saneamiento',i:'p-agua',re:/agua potable|alcantarill|sanitari|\bapr\b|riego|\bcanal\b|colector|tranque|embalse|\bpozo|drenaje|aguas lluvia|aguas servidas|planta de tratamiento/},
+  {k:'deporte',t:'Deporte y recreación',i:'p-deporte',re:/multicancha|cancha|estadio|gimnasio|polideportiv|deportiv|piscina|skate|camarines|juegos infantiles|medialuna/},
+  {k:'salud',t:'Salud',i:'p-salud',re:/cesfam|hospital|consultorio|\bsapu\b|\bsalud\b|\bposta\b|\bpostas\b|cecosf|clinica/},
+  {k:'escuela',t:'Educación',i:'p-escuela',re:/escuela|colegio|liceo|jardin infantil|sala cuna|educacion|establecimiento educacional|educacionales|internado|universidad|\buoh\b/},
+  {k:'energia',t:'Energía y alumbrado',i:'p-energia',re:/electric|alumbrado|luminaria|fotovolt|paneles solares|subestacion|iluminacion/},
+  {k:'verde',t:'Plazas y áreas verdes',i:'p-verde',re:/\bplaza|plazuela|plazoleta|parque|area verde|areas verdes|paisaj|forestal|arbol|\bjardin\b/},
+  {k:'vivienda',t:'Vivienda',i:'p-vivienda',re:/vivienda|habitacional|habitabilidad|departamentos|condominio|\bcasas?\b|poblacion|subsidio/},
+  {k:'edificio',t:'Edificación',i:'p-edificio',re:/edificio|cuartel|comisaria|bomberos|dependencias|municipalidad|centro comunitario|centro artesanal|\bsede\b|biblioteca|cementerio|oficinas?|gendarmeria|recinto|bodega|cierre perimetral|galpon|multiuso/},
+  {k:'material',t:'Materiales y suministros',i:'p-materiales',re:/suministro|materiales|cemento|hormigon|aridos|maicillo|fierro|acero|ferreteria|pintura|insumos|mobiliario|equipamiento|adquisicion de/},
+  {k:'estudio',t:'Estudios y diseño',i:'p-estudio',re:/estudio|diseno|ingenieria|consultoria|asesoria|inspeccion tecnica|inspeccion fiscal|\bito\b|topograf|factibilidad|levantamiento|auditoria/},
+  {k:'obra',t:'Otras obras',i:'p-obra',gen:true,re:/mantencion|mantenimiento|reparacion|conservacion|reposicion|mejoramiento|habilitacion|normalizacion|ampliacion|construccion|obras?\b/}
+];
+var PROY_OTRO={k:'otro',t:'Otros',i:'i-hat'};
+var PROY_POR_K={};PROYECTOS.concat([PROY_OTRO]).forEach(function(p){PROY_POR_K[p.k]=p;});
+function buscarProy(txt,conGen){
+  if(!txt)return null;
+  for(var i=0;i<PROYECTOS.length;i++){var p=PROYECTOS[i];if((conGen||!p.gen)&&p.re.test(txt))return p;}
+  return null;
+}
+function tipoProyecto(l){
+  var nom=norm(l.nombre);
+  // Si el nombre parte como estudio o consultoría, manda eso aunque mencione la obra estudiada.
+  if(/^(servicio de |servicios de |contratacion de )?(consultoria|estudio|diseno|asesoria|inspeccion|ito\b|levantamiento)/.test(nom))return PROY_POR_K.estudio;
+  return buscarProy(nom,false)||buscarProy(norm(l.descripcion),false)||buscarProy(norm((l.rubros||[]).join(' ')),false)||buscarProy(nom,true)||PROY_OTRO;
+}
+function iconoProy(p){return '<svg class="ic" aria-hidden="true"><use href="#'+p.i+'"/></svg>';}
+
 var LINEAS=['Obras','Materiales y suministros','Maquinaria y equipos','Estudios y servicios técnicos'];
 var ESTADOS=['Adjudicada','Desierta','Revocada','Suspendida','Cerrada'];
 var ETQ_ESTADO={Adjudicada:'Adjudicada',Desierta:'Desierta',Revocada:'Revocada',Suspendida:'Suspendida',Cerrada:'Cerrada, sin resultado aún'};
@@ -275,7 +407,11 @@ var MOTIVOS={
 };
 
 var filas=[], datos=null, pagina=1;
-var F0={q:'',organismo:'',comuna:'',linea:'',periodo:'',estado:'',afin:true};
+var F0={q:'',organismo:'',comuna:'',linea:'',periodo:'',estado:'',conmonto:false,afin:true};
+// Grupos de estados que usan las cifras: «Desiertas o revocadas» y «Sin resultado aún»
+var GRUPOS={DR:['Desierta','Revocada'],PEND:['Cerrada','Suspendida']};
+var ETQ_GRUPO={DR:'Desiertas o revocadas',PEND:'Sin resultado aún (cerradas o suspendidas)'};
+var ordenAntes=null;
 var F=Object.assign({},F0);
 var orden={col:'cierre',dir:-1};
 var COLS=[{k:'cierre',t:'Cierre'},{k:'id',t:'ID'},{k:'nombre',t:'Licitación'},{k:'organismo',t:'Organismo'},{k:'estado',t:'Estado'},{k:'empresa',t:'Empresa adjudicada'},{k:'monto',t:'Monto adjudicado'}];
@@ -304,7 +440,7 @@ function prepararFilas(lics){
     out.push({
       l:l, ms:ms==null?0:ms, dias:ms==null?99999:Math.max(0,Math.floor((ahora-ms)/DIA)),
       estado:ESTADOS.indexOf(l.estado)>=0?l.estado:'Cerrada',
-      comuna:comuna, emp:emp, adj:adj, clpAdj:clpAdj,
+      comuna:comuna, emp:emp, adj:adj, clpAdj:clpAdj, pr:tipoProyecto(l).k,
       empTxt:emp.map(function(e){return e.nombre;}).join(' | '),
       texto:norm([l.id,l.nombre,l.descripcion,l.organismo,l.unidad,comuna,l.sector,emp.map(function(e){return e.nombre+' '+e.rut;}).join(' ')].join(' '))
     });
@@ -319,7 +455,8 @@ function pasa(f,omitir){
   if(omitir!=='comuna' && F.comuna && f.comuna!==F.comuna)return false;
   if(omitir!=='linea' && F.linea && l.linea!==F.linea)return false;
   if(omitir!=='periodo' && F.periodo && f.dias>parseInt(F.periodo,10))return false;
-  if(omitir!=='estado' && F.estado && f.estado!==F.estado)return false;
+  if(omitir!=='estado' && F.estado){var g=GRUPOS[F.estado];if(g?g.indexOf(f.estado)<0:f.estado!==F.estado)return false;}
+  if(omitir!=='estado' && F.conmonto && f.clpAdj==null)return false;
   if(F.afin && !l.afin)return false;
   return true;
 }
@@ -366,19 +503,96 @@ function chips(){
   $('#chips').innerHTML=h;
 }
 
-function kpis(arr){
-  var cn=contar(arr,function(f){return f.estado;});
-  var adj=arr.filter(function(f){return f.estado==='Adjudicada';});
+var kpiPrev={}, barPrev={}, primeraCarga=true;
+function reducido(){return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);}
+function contarHasta(el,desde,fin,dur){
+  var t0=null;
+  function paso(t){
+    if(t0===null)t0=t;
+    var k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+    el.textContent=nf.format(Math.round(desde+(fin-desde)*e));
+    if(k<1)requestAnimationFrame(paso);
+  }
+  requestAnimationFrame(paso);
+}
+function kpis(){
+  // Las cifras respetan los demás filtros pero NO el estado: cada una muestra cuántas licitaciones
+  // aparecerán en la tabla si se hace clic en ella.
+  var base=filtradas('estado'), cn=contar(base,function(f){return f.estado;});
+  var adj=base.filter(function(f){return f.estado==='Adjudicada';});
   var conM=adj.filter(function(f){return f.clpAdj!=null;});
   var suma=conM.reduce(function(a,f){return a+f.clpAdj;},0);
   var conE=adj.filter(function(f){return f.emp.length;}).length;
-  var pend=(cn.Cerrada||0)+(cn.Suspendida||0);
-  $('#kpis').innerHTML=
-    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-doc"/></svg>Cerradas en seguimiento</div><div class="val">'+nf.format(arr.length)+'</div><div class="det">'+(arr.length===filas.length?'Todas las registradas':'de '+nf.format(filas.length)+' registradas')+'</div></div>'+
-    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Adjudicadas</div><div class="val">'+nf.format(cn.Adjudicada||0)+'</div><div class="det">'+nf.format(conE)+' con empresa informada</div></div>'+
-    '<div class="kpi alerta"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-warn"/></svg>Desiertas o revocadas</div><div class="val">'+nf.format((cn.Desierta||0)+(cn.Revocada||0))+'</div><div class="det">'+nf.format(cn.Desierta||0)+' desiertas · '+nf.format(cn.Revocada||0)+' revocadas</div></div>'+
-    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>Sin resultado aún</div><div class="val">'+nf.format(pend)+'</div><div class="det">Cerradas o suspendidas</div></div>'+
-    '<div class="kpi"><div class="et"><svg class="ic" aria-hidden="true"><use href="#i-coin"/></svg>Monto adjudicado (CLP)</div><div class="val">'+(conM.length?fmtMM(suma):'—')+'</div><div class="det">'+nf.format(conM.length)+' de '+nf.format(adj.length)+' adjudicadas informan monto</div></div>';
+  var nDR=(cn.Desierta||0)+(cn.Revocada||0), pend=(cn.Cerrada||0)+(cn.Suspendida||0), n=base.length;
+  function pc(x,y){return y>0?Math.min(100,Math.round(x/y*100)):0;}
+  var idx=0;
+  function kpi(k,cls,ico,et,val,num,det,pct,capt,pres,go){
+    var prevW=(k in barPrev)?barPrev[k]:0; barPrev[k]=pct;
+    var i=idx++;
+    return '<div class="kpi'+cls+'" role="button" tabindex="0" data-kpi="'+k+'"'+(pres==null?'':' aria-pressed="'+(pres?'true':'false')+'"')+' style="--i:'+i+'">'+
+      '<div class="et"><svg class="ic" aria-hidden="true"><use href="#'+ico+'"/></svg>'+et+'</div>'+
+      '<div class="val"'+(num==null?'':' data-n="'+num+'"')+'>'+val+'</div><div class="det">'+det+'</div>'+
+      '<div class="prop"><span class="prop-b" aria-hidden="true"><i data-w="'+pct+'" style="width:'+prevW+'%"></i></span><span class="prop-t">'+nf.format(pct)+' % '+capt+'</span></div>'+
+      '<div class="kpi-go">'+(pres?'Quitar filtro':go)+'<svg class="ic" aria-hidden="true"><use href="#'+(pres?'i-x':'i-chev')+'"/></svg></div></div>';
+  }
+  var kp=$('#kpis');
+  kp.classList.toggle('entra',primeraCarga);
+  kp.innerHTML=
+    kpi('todas','','i-doc','Cerradas en seguimiento',nf.format(n),n,(n===filas.length?'Todas las registradas':'de '+nf.format(filas.length)+' registradas'),pc(n,filas.length),'de las registradas',null,'Ver todas en la tabla')+
+    kpi('adj','','i-check','Adjudicadas',nf.format(cn.Adjudicada||0),cn.Adjudicada||0,nf.format(conE)+' con empresa informada',pc(cn.Adjudicada||0,n),'de las cerradas',F.estado==='Adjudicada'&&!F.conmonto,'Ver en la tabla')+
+    kpi('dr',' alerta','i-warn','Desiertas o revocadas',nf.format(nDR),nDR,nf.format(cn.Desierta||0)+' desiertas · '+nf.format(cn.Revocada||0)+' revocadas',pc(nDR,n),'de las cerradas',F.estado==='DR','Ver en la tabla')+
+    kpi('pend','','i-clock','Sin resultado aún',nf.format(pend),pend,'Cerradas o suspendidas',pc(pend,n),'de las cerradas',F.estado==='PEND','Ver en la tabla')+
+    kpi('monto','','i-coin','Monto adjudicado (CLP)',(conM.length?fmtMM(suma):'—'),null,nf.format(conM.length)+' de '+nf.format(adj.length)+' adjudicadas informan monto',pc(conM.length,adj.length),'informa monto',F.estado==='Adjudicada'&&F.conmonto,'Solo con monto');
+  var red=reducido();
+  kp.querySelectorAll('.val[data-n]').forEach(function(el){
+    var k=el.closest('.kpi').getAttribute('data-kpi'), fin=+el.getAttribute('data-n'), desde=(k in kpiPrev)?kpiPrev[k]:0;
+    kpiPrev[k]=fin;
+    if(!red && desde!==fin)contarHasta(el,desde,fin,primeraCarga?850:450);
+  });
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    kp.querySelectorAll('.prop-b i').forEach(function(b){b.style.width=b.getAttribute('data-w')+'%';});
+  });});
+  primeraCarga=false;
+}
+
+function irATabla(){
+  var t=$('#tabla-sec');
+  t.scrollIntoView({behavior:reducido()?'auto':'smooth',block:'start'});
+  t.classList.remove('pulso'); void t.offsetWidth; t.classList.add('pulso');
+  setTimeout(function(){t.classList.remove('pulso');},1500);
+}
+function quitarEstado(){
+  F.estado='';F.conmonto=false;
+  if(ordenAntes){orden=ordenAntes;ordenAntes=null;}
+}
+function aplicarKpi(k){
+  var apl=true;
+  if(k==='todas')quitarEstado();
+  else{
+    var ya=(k==='adj'&&F.estado==='Adjudicada'&&!F.conmonto)||(k==='dr'&&F.estado==='DR')||(k==='pend'&&F.estado==='PEND')||(k==='monto'&&F.estado==='Adjudicada'&&F.conmonto);
+    if(ya){quitarEstado();apl=false;}
+    else{
+      if(!ordenAntes)ordenAntes={col:orden.col,dir:orden.dir};
+      F.conmonto=false;
+      if(k==='adj')F.estado='Adjudicada';
+      else if(k==='dr')F.estado='DR';
+      else if(k==='pend')F.estado='PEND';
+      else if(k==='monto'){F.estado='Adjudicada';F.conmonto=true;orden={col:'monto',dir:-1};}
+    }
+  }
+  pagina=1; render();
+  var el=document.querySelector('#kpis [data-kpi="'+k+'"]'); if(el)el.focus({preventScroll:true});
+  if(apl)irATabla();
+}
+function activos(){
+  var a=[];
+  if(F.estado){
+    var et=F.conmonto?'Adjudicadas con monto informado':(GRUPOS[F.estado]?ETQ_GRUPO[F.estado]:(F.estado==='Adjudicada'?'Adjudicadas':ETQ_ESTADO[F.estado]));
+    a.push(et);
+  }
+  $('#activo').innerHTML=a.length?'<span class="lbl">Mostrando solo:</span>'+a.map(function(x){
+    return '<span class="achip">'+esc(x)+'<button type="button" data-quitar="estado" aria-label="Quitar filtro: '+esc(x)+'"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></span>';
+  }).join(''):'';
 }
 
 function cabecera(){
@@ -426,17 +640,20 @@ function montoHtml(f){
   return fmtPlata(a.monto,l.moneda)+est;
 }
 
+var sigFilas='';
 function tabla(arr){
   var total=arr.length, paginas=Math.max(1,Math.ceil(total/POR_PAGINA));
   if(pagina>paginas)pagina=paginas;
   var ini=(pagina-1)*POR_PAGINA, vis=arr.slice(ini,ini+POR_PAGINA);
   $('#cuenta').textContent=total?('Mostrando '+(ini+1)+'–'+(ini+vis.length)+' de '+nf.format(total)):'Sin resultados';
-  $('#cuerpo').innerHTML=vis.map(function(f){
-    var l=f.l, u=urlSegura(l);
-    return '<tr>'+
+  var sig=vis.map(function(f){return f.l.id;}).join('|');
+  $('#cuerpo').classList.toggle('anim',sig!==sigFilas); sigFilas=sig;
+  $('#cuerpo').innerHTML=vis.map(function(f,i){
+    var l=f.l, u=urlSegura(l), pj=PROY_POR_K[f.pr]||PROY_OTRO;
+    return '<tr style="--i:'+Math.min(i,10)+'">'+
       '<td data-et="Cierre"><strong>'+esc(fmtDia(l.cierre))+'</strong><span class="cierre">'+esc((l.cierre||'').slice(11,16))+'</span></td>'+
       '<td data-et="ID"><a class="id" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+esc(l.id)+'</a><br><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Mercado Público ↗</a></td>'+
-      '<td data-et="Licitación"><span class="nombre">'+esc(l.nombre)+'</span>'+descripcionHtml(l)+
+      '<td data-et="Licitación"><span class="pico" role="img" aria-label="Tipo de proyecto: '+esc(pj.t)+'" title="'+esc(pj.t)+'">'+iconoProy(pj)+'</span><span class="nombre">'+esc(l.nombre)+'</span>'+descripcionHtml(l)+
         (l.tipo_nombre?'<span class="tipo">'+esc(l.tipo_nombre)+'</span>':'')+
         (l.afin?'<span class="etq" title="'+esc(MOTIVOS[l.afin_motivo]||'Clasificación referencial')+'">Afín a construcción</span>':'')+(l.afin&&l.linea?'<span class="etq lin">'+esc(l.linea)+'</span>':'')+'</td>'+
       '<td data-et="Organismo comprador"><span class="org">'+esc(l.organismo)+'</span>'+(l.unidad?'<span class="uni">'+esc(l.unidad)+'</span>':'')+'<span class="uni">'+esc(f.comuna||'Comuna no informada')+'</span></td>'+
@@ -457,7 +674,7 @@ function tabla(arr){
 
 function render(){
   var arr=filtradas().sort(cmp);
-  kpis(arr); chips(); cabecera(); tabla(arr);
+  kpis(); chips(); activos(); cabecera(); tabla(arr);
 }
 
 function exportarCSV(){
@@ -491,14 +708,25 @@ function ligar(){
   document.querySelectorAll('.seg').forEach(function(b){b.addEventListener('click',function(){F.afin=b.getAttribute('data-alc')==='1';sincAlcance();prepararFiltros();pagina=1;render();});});
   $('#limpiar').addEventListener('click',function(){
     F=Object.assign({},F0);
-    $('#f-q').value='';sincAlcance();prepararFiltros();Object.keys(map).forEach(function(id){$(id).value='';});pagina=1;render();
+    $('#f-q').value='';sincAlcance();prepararFiltros();Object.keys(map).forEach(function(id){$(id).value='';});
+    if(ordenAntes){orden=ordenAntes;ordenAntes=null;}
+    pagina=1;render();
+  });
+  $('#kpis').addEventListener('keydown',function(e){
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    var k=e.target.closest&&e.target.closest('[data-kpi]');
+    if(k){e.preventDefault();aplicarKpi(k.getAttribute('data-kpi'));}
   });
   $('#exportar').addEventListener('click',exportarCSV);
   document.addEventListener('click',function(e){
+    var kp=e.target.closest&&e.target.closest('[data-kpi]');
+    if(kp){aplicarKpi(kp.getAttribute('data-kpi'));return;}
+    var qx=e.target.closest&&e.target.closest('[data-quitar]');
+    if(qx){quitarEstado();pagina=1;render();return;}
     var ch=e.target.closest&&e.target.closest('[data-estado]');
-    if(ch){F.estado=ch.getAttribute('data-estado');pagina=1;render();return;}
+    if(ch){F.estado=ch.getAttribute('data-estado');F.conmonto=false;if(ordenAntes){orden=ordenAntes;ordenAntes=null;}pagina=1;render();return;}
     var o=e.target.closest&&e.target.closest('[data-ord]');
-    if(o){var c=o.getAttribute('data-ord');if(orden.col===c)orden.dir=-orden.dir;else{orden.col=c;orden.dir=(c==='cierre'||c==='monto')?-1:1;}pagina=1;render();return;}
+    if(o){var c=o.getAttribute('data-ord');ordenAntes=null;if(orden.col===c)orden.dir=-orden.dir;else{orden.col=c;orden.dir=(c==='cierre'||c==='monto')?-1:1;}pagina=1;render();return;}
     if(e.target.id==='p-ant'){pagina--;render();$('#cuenta').scrollIntoView({block:'center'});}
     if(e.target.id==='p-sig'){pagina++;render();$('#cuenta').scrollIntoView({block:'center'});}
   });
@@ -518,7 +746,7 @@ fetch('cerradas.json?v='+Date.now(),{cache:'no-store'})
   .catch(function(e){
     $('#actualizado').textContent='Sin datos';
     $('#avisos').innerHTML='<div class="aviso info" role="alert">Todavía no hay datos de seguimiento ('+esc(e.message)+'). Aparecerán después de la próxima actualización automática del panel.</div>';
-    cabecera(); kpis([]); chips();
+    cabecera(); kpis(); chips();
   });
 })();
 </script>
