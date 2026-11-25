@@ -29,36 +29,37 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Evita actualizaciones duplicadas: en una ejecucion programada, si el panel ya se actualizo
-  # hace menos de 90 minutos, no se hace nada (no se gasta cupo de la API). Las ejecuciones
-  # manuales (boton "Run workflow") siempre actualizan.
+  # Evita actualizaciones duplicadas: en una ejecucion programada, si la pagina PUBLICADA ya se
+  # actualizo hace menos de 90 minutos, no se hace nada (no se gasta cupo de la API). Se mira la
+  # pagina publicada y no el repositorio, para que una publicacion fallida se reintente en la
+  # siguiente ejecucion. Las ejecuciones manuales (boton "Run workflow") siempre actualizan, y si
+  # no se puede leer la pagina, tambien se actualiza.
   revisar:
     runs-on: ubuntu-latest
     outputs:
       saltar: ${{ steps.chequeo.outputs.saltar }}
     steps:
-      - name: Descargar el repositorio
-        uses: actions/checkout@v4
-
-      - name: Revisar cuando se actualizo por ultima vez
+      - name: Revisar cuando se publico por ultima vez
         id: chequeo
         env:
           EVENTO: ${{ github.event_name }}
+          URL_DATOS: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/data.json
         run: |
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os, sys
+          import json, os, sys, time, urllib.request
           from datetime import datetime, timezone
           saltar = "false"
           if os.environ.get("EVENTO") == "schedule":
               try:
-                  with open("docs/data.json", encoding="utf-8") as f:
-                      generado = json.load(f)["generado"]
+                  url = os.environ["URL_DATOS"] + "?t=%d" % time.time()
+                  with urllib.request.urlopen(url, timeout=20) as r:
+                      generado = json.load(r)["generado"]
                   minutos = (datetime.now(timezone.utc) - datetime.fromisoformat(generado)).total_seconds() / 60
-                  print("Ultima actualizacion hace %.0f minutos" % minutos, file=sys.stderr)
+                  print("Ultima publicacion hace %.0f minutos" % minutos, file=sys.stderr)
                   if minutos < 90:
                       saltar = "true"
               except Exception as e:
-                  print("No se pudo leer la ultima actualizacion (%s); se actualiza igual." % e, file=sys.stderr)
+                  print("No se pudo leer la pagina publicada (%s); se actualiza igual." % e, file=sys.stderr)
           print("saltar=" + saltar)
           PY
 
@@ -67,9 +68,6 @@ jobs:
     if: needs.revisar.outputs.saltar != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 240
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Descargar el repositorio
         uses: actions/checkout@v4
@@ -107,6 +105,18 @@ jobs:
         uses: actions/upload-pages-artifact@v5
         with:
           path: docs
+
+  # La publicación va en un trabajo aparte (es el esquema recomendado por GitHub): así la
+  # página armada queda registrada antes de publicarla.
+  publicar:
+    needs: actualizar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Esperar unos segundos a que GitHub registre la página
+        run: sleep 30
 
       - name: Publicar la página
         id: deployment
